@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding  = "8dp"
+        tools:context="com.example.amrel.paybuttonexample.MainActivity">
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="@dimen/_30sdp"
+            android:text="@string/app_name"
+            android:gravity="center"
+            android:textSize = "16sp"
+            android:padding="2dp" />
+
+
+        <EditText
+            android:id="@+id/merchant_id_editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="merchant id"
+            android:inputType="number"
+            android:text="40044" />
+
+        <EditText
+            android:id="@+id/terminal_id_editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="terminal id"
+            android:inputType="number"
+            android:text="12345670" />
+
+        <EditText
+            android:id="@+id/amount_editText"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="amount"
+            android:inputType="numberDecimal"
+            android:text="20" />
+
+
+        <io.paysky.ui.custom.PayButton
+            android:id="@+id/paybtn"
+            android:layout_width="120dp"
+            android:layout_height="40dp" />
+
+
+        <TextView
+            android:id="@+id/payment_status_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:gravity="center" />
+
+    </LinearLayout>
+
+    <ImageView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_margin="4dp"
+        android:src="@drawable/ic_pay_sky_logo2" />
+</RelativeLayout>

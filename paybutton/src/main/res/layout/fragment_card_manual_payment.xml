@@ -1,0 +1,204 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TableLayout xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/data_layout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        tools:context="io.paysky.ui.fragment.manualpayment.CardManualPaymentFragment">
+
+        <TableRow
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="@dimen/_6sdp">
+
+            <LinearLayout
+                android:id="@+id/card_payment_layout"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_34sdp"
+                android:layout_marginEnd="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/payment_option_selected"
+                android:button="@null"
+                android:checked="true"
+                android:drawableStart="@drawable/ic_card"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/card_payment_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    android:drawableStart="@drawable/ic_card"
+                    android:gravity="center_vertical"
+                    android:text="@string/card"
+                    android:textColor="@android:color/white" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/wallet_payment_layout"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_34sdp"
+                android:layout_marginStart="4dp"
+                android:layout_weight="1"
+                android:background="@drawable/payment_option_unselected"
+                android:button="@null"
+                android:checked="true"
+                android:drawableStart="@drawable/ic_card"
+                android:gravity="center">
+
+                <TextView
+                    android:id="@+id/wallet_payment_textView"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:drawablePadding="8dp"
+                    android:drawableStart="@drawable/ic_wallet_gray"
+                    android:gravity="center_vertical"
+                    android:text="@string/wallet"
+                    android:textColor="#2D3134" />
+
+            </LinearLayout>
+        </TableRow>
+
+        <TextView
+            android:layout_marginBottom="@dimen/_7sdp"
+            android:layout_marginTop="@dimen/_7sdp"
+            android:gravity="center"
+            android:text="@string/enter_card_data"
+            android:textColor="#282C2E" />
+
+
+        <TableRow>
+
+            <ImageView
+                android:id="@+id/card_type_imageView"
+                android:layout_width="40dp"
+                android:layout_height="25dp"
+                android:layout_marginEnd="@dimen/_12sdp"
+                android:layout_marginStart="@dimen/_12sdp" />
+        </TableRow>
+
+        <LinearLayout
+            android:layout_height="@dimen/_40sdp"
+            android:layout_marginEnd="@dimen/_12sdp"
+            android:layout_marginStart="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_4sdp"
+            android:background="@drawable/edittext_drawable">
+
+            <io.paysky.ui.custom.CardEditText
+                android:id="@+id/card_number_editText"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_weight="1"
+                android:background="@drawable/edittext_drawable"
+                android:digits="01234 56789"
+                android:hint="@string/card_number"
+                android:imeOptions="actionNext"
+                android:inputType="number"
+                android:maxLength="19"
+                android:maxLines="1"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:singleLine="true"
+                android:textColorHint="?android:textColorHint" />
+
+            <ImageView
+                android:id="@+id/scan_camera_imageView"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_gravity="center"
+                android:layout_marginEnd="8dp"
+                android:layout_marginTop="4dp"
+                android:src="@drawable/ic_scan_camera" />
+        </LinearLayout>
+
+        <EditText
+            android:id="@+id/card_owner_name_editText"
+            android:layout_width="match_parent"
+            android:layout_height="42dp"
+            android:layout_marginEnd="@dimen/_12sdp"
+            android:layout_marginStart="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:background="@drawable/edittext_drawable"
+            android:hint="@string/name_on_card"
+            android:imeOptions="actionNext"
+            android:maxLines="1"
+            android:paddingStart="8dp"
+            android:singleLine="true"
+            android:textColorHint="?android:textColorHint" />
+
+        <TableRow
+            android:layout_marginEnd="@dimen/_12sdp"
+            android:layout_marginStart="@dimen/_12sdp"
+            android:layout_marginTop="@dimen/_12sdp">
+
+            <io.paysky.ui.custom.ExpiryDate
+                android:id="@+id/expire_date_editText"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_marginEnd="@dimen/_6sdp"
+                android:layout_weight="1"
+                android:background="@drawable/rectengle_drawable"
+                android:drawableEnd="@drawable/ic_expire_date"
+                android:hint="@string/expire_date"
+                android:imeOptions="actionNext"
+                android:inputType="number"
+                android:maxLength="5"
+                android:maxLines="1"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:singleLine="true"
+                android:textColorHint="?android:textColorHint" />
+
+            <EditText
+                android:id="@+id/ccv_editText"
+                android:layout_width="0dp"
+                android:layout_height="@dimen/_40sdp"
+                android:layout_marginStart="@dimen/_6sdp"
+                android:layout_weight="1"
+                android:background="@drawable/rectengle_drawable"
+                android:drawableEnd="@drawable/ic_card_colored"
+                android:hint="@string/cvc"
+                android:imeOptions="actionDone"
+                android:inputType="date"
+                android:maxLength="3"
+                android:maxLines="1"
+                android:paddingEnd="8dp"
+                android:paddingStart="8dp"
+                android:singleLine="true"
+                android:textColorHint="?android:textColorHint" />
+        </TableRow>
+
+        <Button
+            android:id="@+id/proceed_button"
+            android:layout_height="42dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="@dimen/_12sdp"
+            android:background="@drawable/baybutton_proceed_button"
+            android:text="@string/proceed"
+            android:textColor="@android:color/white" />
+
+        <LinearLayout
+            android:id="@+id/swipe_layout"
+            android:layout_height="42dp"
+            android:layout_marginEnd="12dp"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/button_gray1"
+            android:gravity="center">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="8dp"
+                android:drawableStart="@drawable/ic_swipe"
+                android:text="@string/swipe" />
+        </LinearLayout>
+    </TableLayout>
+
+</LinearLayout>

@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="12dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginTop="6dp">
+
+        <LinearLayout
+            android:id="@+id/card_payment_layout"
+            android:layout_width="0dp"
+            android:layout_height="38dp"
+            android:layout_marginRight="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/payment_option_unselected"
+            android:button="@null"
+            android:checked="true"
+            android:drawableLeft="@drawable/ic_card"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/card_payment_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_card_black"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="@string/card"
+                android:textColor="#2D3134" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/wallet_payment_layout"
+            android:layout_width="0dp"
+            android:layout_height="38dp"
+            android:layout_marginLeft="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/payment_option_selected"
+            android:button="@null"
+            android:checked="true"
+            android:drawableLeft="@drawable/ic_card"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/wallet_payment_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawableLeft="@drawable/ic_wallet_white"
+                android:drawablePadding="8dp"
+                android:gravity="center_vertical"
+                android:text="@string/wallet"
+                android:textColor="#FFF" />
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/qr_code_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:drawableLeft="@drawable/ic_triangle_gray"
+                android:gravity="center"
+                android:text="@string/qr_code" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="match_parent"
+            android:layout_margin="4dp"
+            android:background="#c1c2c2" />
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center">
+
+            <TextView
+                android:id="@+id/sms_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:drawableLeft="@drawable/ic_triangle_gray"
+                android:gravity="center"
+                android:text="@string/sms" />
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>
