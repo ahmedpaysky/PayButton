@@ -71,4 +71,6 @@
     <string name="request_payment">طلب اموال</string>
     <string name="invalid_expire_date_date">تاريخ الانتهاء غير صحيح.</string>
     <string name="egp">جنية</string>
+
+    <string name="test">test</string>
 </resources>
