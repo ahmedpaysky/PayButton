@@ -140,7 +140,7 @@
             android:layout_marginTop="8dp"
             android:gravity="center"
             android:textColor="#00BFA5"
-            android:textSize="15sdp"
+            android:textSize="15sp"
             tools:text="ahmed" />
 
         <Button
