@@ -97,9 +97,9 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
         TextView approvedTextView = view.findViewById(R.id.approved_textView);
         ((BaseActivity) getActivity()).showHtmlText(approvedTextView, R.string.transaction_success);
         TextView authNumberTextView = view.findViewById(R.id.auth_number_textView);
-        authNumberTextView.setText("#" + referenceNumber);
+        authNumberTextView.setText(getString(R.string.auth_number) + " #" + referenceNumber);
         TextView trxIdTextView = view.findViewById(R.id.trx_id_textView);
-        trxIdTextView.setText("#" + transactionId);
+        trxIdTextView.setText(getString(R.string.trx_id) + " #" + transactionId);
         closePrintLayout = view.findViewById(R.id.close_print_layout);
         Button closeButton = view.findViewById(R.id.close_button);
         closeButton.setOnClickListener(this);

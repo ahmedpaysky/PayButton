@@ -28,8 +28,8 @@
     <string name="invalid_ccv">CCV should be 3 digits length.</string>
     <string name="please_wait">Please wait…</string>
     <string name="error_try_again">Error in connection,try again.</string>
-    <string name="auth_number">Auth NO #</string>
-    <string name="trx_id">TRX ID #</string>
+    <string name="auth_number">Auth Code:</string>
+    <string name="trx_id">Transaction No:</string>
     <string name="close">Close</string>
     <string name="send_receipt">Send Receipt</string>
     <string name="send_notification">Send notification</string>

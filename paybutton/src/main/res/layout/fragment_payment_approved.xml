@@ -22,46 +22,32 @@
         android:layout_marginRight="@dimen/_10sdp"
         android:layout_marginTop="@dimen/_10sdp">
 
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/auth_number"
-            android:gravity="center"
-            android:textColor="#282C2E" />
-
-        <TextView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="@string/trx_id"
-            android:gravity="center"
-            android:textColor="#282C2E" />
-    </TableRow>
-
-
-    <TableRow
-        android:layout_marginLeft="@dimen/_10sdp"
-        android:layout_marginRight="@dimen/_10sdp"
-        android:layout_marginTop="@dimen/_10sdp">
 
         <TextView
             android:id="@+id/auth_number_textView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            tools:text="@string/auth_number"
             android:gravity="center"
-            android:textColor="#282C2E" />
+            android:textColor="#282C2E"
+            tools:text="@string/auth_number" />
+
+    </TableRow>
+
+
+    <TableRow
+        android:layout_marginLeft="@dimen/_10sdp"
+        android:layout_marginRight="@dimen/_10sdp"
+        android:layout_marginTop="@dimen/_6sdp">
 
         <TextView
             android:id="@+id/trx_id_textView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            tools:text="@string/trx_id"
             android:gravity="center"
-            android:textColor="#282C2E" />
+            android:textColor="#282C2E"
+            tools:text="@string/trx_id" />
     </TableRow>
 
     <TableRow
@@ -152,9 +138,10 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:gravity="center"
             android:textColor="#00BFA5"
-            tools:text="ahmed"
-            android:gravity="center" />
+            android:textSize="15sdp"
+            tools:text="ahmed" />
 
         <Button
             android:id="@+id/close_view_button"
