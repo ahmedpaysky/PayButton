@@ -28,8 +28,8 @@
     <string name="invalid_ccv">رمز الحماية يجب ان يكون 3 ارقام.</string>
     <string name="please_wait">برجاء الانتظار…</string>
     <string name="error_try_again">خطأ فى الاتصال,حاول مرة أخرى.</string>
-    <string name="auth_number">رقم التحقق #</string>
-    <string name="trx_id">رقم المعاملة #</string>
+    <string name="auth_number">رقم التحقق </string>
+    <string name="trx_id">رقم المعاملة </string>
     <string name="close">اغلاق</string>
     <string name="send_receipt">ارسل نسخة</string>
     <string name="send_notification">ارسال اشعار</string>
