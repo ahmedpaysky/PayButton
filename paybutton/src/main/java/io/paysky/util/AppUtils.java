@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.net.ConnectivityManager;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
 import android.text.TextUtils;
@@ -145,5 +146,10 @@ public class AppUtils {
                 .replace("۱", "1").replace("۲", "2").replace("۳", "3").replace("۴", "4").replace("۵", "5")
                 .replace("۶", "6").replace("۷", "7").replace("۸", "8")
                 .replace("۹", "9").replace("۰", "0").replace("٫", ".");
+    }
+
+    public static boolean isPOSDevice() {
+        String model = Build.MODEL;
+        return model.equals("SQ27");
     }
 }

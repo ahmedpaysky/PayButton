@@ -63,7 +63,8 @@
             android:layout_height="@dimen/_40sdp"
             android:layout_marginEnd="4dp"
             android:layout_weight="1"
-            android:text="@string/close" />
+            android:text="@string/close"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/send_receipt_button"
@@ -73,7 +74,7 @@
             android:layout_marginStart="4dp"
             android:layout_weight="1"
             android:background="@drawable/baybutton_proceed_button"
-            android:text="@string/send_receipt" />
+            android:text="@string/print" />
     </TableRow>
 
     <LinearLayout
@@ -154,4 +155,6 @@
             android:background="@drawable/baybutton_proceed_button"
             android:text="@string/close" />
     </LinearLayout>
+
+
 </TableLayout>

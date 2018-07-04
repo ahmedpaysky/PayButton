@@ -46,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
                     public void onSuccess(String referenceNumber, String responseCode, String authorizationCode) {
                         paymentStatusTextView.setText("reference number = " + referenceNumber
                                 + " , response code = " + responseCode + " , authorization code = " + authorizationCode);
+
                     }
 
                     @Override
