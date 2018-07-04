@@ -28,21 +28,21 @@
     <string name="invalid_ccv">رمز الحماية يجب ان يكون 3 ارقام.</string>
     <string name="please_wait">برجاء الانتظار…</string>
     <string name="error_try_again">خطأ فى الاتصال,حاول مرة أخرى.</string>
-    <string name="auth_number">رقم التحقق </string>
+    <string name="auth_number">رقم الموافقة </string>
     <string name="trx_id">رقم المعاملة </string>
     <string name="close">اغلاق</string>
     <string name="send_receipt">ارسل نسخة</string>
-    <string name="send_notification">ارسال اشعار</string>
+    <string name="send_notification">ارسال الاشعار</string>
     <string name="email_hint">البريد الالكترونى</string>
     <string name="send">ارسال</string>
     <string name="transaction_success"><![CDATA[
-             <font color="#282C2E">معاملة </font> <font color="#00BFA5">مقبولة </font>
+             <font color="#282C2E">عملية </font> <font color="#00BFA5">مقبولة </font>
     ]]></string>
     <string name="invalid_mail">البريد الالكترونى غير صحيح.</string>
     <string name="mail_sent_to">تم إرسال بريد الكترونى الى </string>
     <string name="cannot_send_mail">تعذر ارسال الايميل</string>
     <string name="transaction_declined"><![CDATA[
-         <font color="#2D3134">معاملة </font> <font color="#C23A2C">مرفوضة</font>
+         <font color="#2D3134">عملية </font> <font color="#C23A2C">مرفوضة</font>
     ]]></string>
     <string name="try_again">حاول مرة أخرى</string>
     <string name="open_wallet_app">قم بفتح تطبيق المحفظة لتتمكن من اتمام المعاملة</string>

@@ -104,6 +104,7 @@
                 android:paddingEnd="8dp"
                 android:paddingStart="8dp"
                 android:singleLine="true"
+                android:textDirection="ltr"
                 android:textColorHint="?android:textColorHint" />
 
             <ImageView
