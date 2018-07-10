@@ -79,6 +79,8 @@ public class MagneticPaymentFragment extends BaseFragment {
         progressDialog = AppUtils.createProgressDialog(getActivity(), R.string.please_wait);
     }
 
+
+
     private void extractBundle() {
         Bundle arguments = getArguments();
         terminalId = arguments.getString(AppConstant.BundleKeys.TERMINAL_ID);
