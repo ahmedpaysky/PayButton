@@ -7,7 +7,7 @@
     <TextView
         android:layout_width="100dp"
         android:layout_height="42dp"
-        android:background="@android:color/holo_orange_dark"
+        android:background="#00a7f6"
         android:gravity="center"
         android:padding="8dp"
         android:text="@string/pay_now"

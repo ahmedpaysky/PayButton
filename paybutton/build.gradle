@@ -4,34 +4,48 @@ apply plugin: 'com.github.dcendents.android-maven'
 group = 'com.github.paysky'
 
 android {
-    compileSdkVersion 26
-
-
-
+    compileSdkVersion 27
     defaultConfig {
         minSdkVersion 17
-        targetSdkVersion 26
-        versionCode 3
-        versionName "1.1.4"
-
+        targetSdkVersion 27
+        versionCode 5
+        versionName "1.1.5"
+        // Enabling multidex support.
+        multiDexEnabled true
     }
-
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
-
+    afterEvaluate {
+        tasks.matching {
+            it.name.startsWith('dex')
+        }.each { dx ->
+            if (dx.additionalParameters == null) {
+                dx.additionalParameters = ['--multi-dex']
+            } else {
+                dx.additionalParameters += '--multi-dex'
+            }
+        }
+    }
+    buildToolsVersion '27.0.3'
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_7
+        targetCompatibility JavaVersion.VERSION_1_7
+    }
 }
 
+
+
 dependencies {
-    implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:26.1.0'
-    implementation 'com.android.support:support-v4:26.1.0'
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.android.support:support-v4:27.1.1'
     implementation 'org.greenrobot:eventbus:3.0.0'
     implementation 'com.jakewharton.timber:timber:4.7.0'
-    implementation 'com.android.support:cardview-v7:26.1.0'
+    implementation 'com.android.support:cardview-v7:27.1.1'
     implementation 'com.pnikosis:materialish-progress:1.7'
     implementation 'commons-codec:commons-codec:1.9'
     implementation 'com.github.prashantsolanki3:Secure-Pref-Manager:0.25'
@@ -48,5 +62,8 @@ dependencies {
     implementation 'com.intuit.sdp:sdp-android:1.0.5'
     implementation 'com.intuit.ssp:ssp-android:1.0.5'
     implementation 'io.card:android-sdk:5.5.1'
-    compile files('libs/platform_sdk_v2.2.0.jar')
+    implementation files('libs/magnetictrackparser-2.01.02.jar')
+    implementation files('libs/platform_sdk_v2.4.0210.jar')
+    compile 'com.android.support:multidex:1.0.3'
 }
+

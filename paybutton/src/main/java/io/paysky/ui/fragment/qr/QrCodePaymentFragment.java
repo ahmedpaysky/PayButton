@@ -32,7 +32,7 @@ public class QrCodePaymentFragment extends BaseFragment implements View.OnClickL
 
 
     //Variables.
-    private String terminalId,testTerminalId = "88888887" , merchantId, amount;
+    private String terminalId, testTerminalId = "88888887", merchantId, amount;
     private boolean isGenerateQrCode, isPaymentDone;
     private String qrCode;
     private String receiverMail;
@@ -102,7 +102,7 @@ public class QrCodePaymentFragment extends BaseFragment implements View.OnClickL
             }
         };
         // this is terminal id
-     //   terminalId = "88888887";
+        //   terminalId = "88888887";
         paymentManager.generateQrCode(amount, merchantId, testTerminalId);
     }
 
@@ -220,6 +220,7 @@ public class QrCodePaymentFragment extends BaseFragment implements View.OnClickL
         bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, testTerminalId);
         bundle.putString(AppConstant.BundleKeys.REFERENCE_NUMBER, externalTransactionId);
         bundle.putString(AppConstant.BundleKeys.TRANSACTION_CHANNEL, AppConstant.TransactionChannelName.TAHWEEL);
+        bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, amount);
         activityHelper.replaceFragmentAndAddOldToBackStack(PaymentApprovedFragment.class, bundle);
     }
 

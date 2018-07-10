@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -148,8 +150,32 @@ public class AppUtils {
                 .replace("۹", "9").replace("۰", "0").replace("٫", ".");
     }
 
-    public static boolean isPOSDevice() {
+ /*   public static boolean isPOSDevice() {
         String model = Build.MODEL;
         return model.equals("SQ27");
+    }*/
+
+    public static boolean isPaymentMachine(Context context) {
+        String model = Build.MODEL;
+        boolean isSq27 = model.equals("SQ27");
+        boolean isI900s = model.equals("i9000S");
+        if (isSq27 || isI900s) {
+            return true;
+        }
+        return false;
+    }
+
+    public static int formatPaymentAmountToServer(String payAmount) {
+        return (int) (Double.valueOf(payAmount) * 100);
+    }
+
+    public static String getVersionNumber(Context context) {
+        try {
+            PackageInfo pInfo = context.getPackageManager().getPackageInfo(context.getPackageName(), 0);
+            return pInfo.versionName;
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return "1.0";
     }
 }

@@ -24,6 +24,8 @@ import io.paysky.data.model.response.MerchantDataResponse;
 import io.paysky.data.model.response.SendReceiptByMailResponse;
 import io.paysky.data.model.response.SmsPaymentResponse;
 import io.paysky.data.model.response.TransactionStatusResponse;
+import io.paysky.data.network.request.magnetic.MigsRequest;
+import io.paysky.data.network.response.MigsResonse;
 import okhttp3.OkHttpClient;
 import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
@@ -184,4 +186,17 @@ public class ApiConnection {
                 .create(ApiInterface.class);
     }
 
+    public static void createMagneticTransaction(MigsRequest migsRequest, final ApiResponseListener<MigsResonse> listener) {
+        createConnection().payWithMagneticCard(migsRequest).enqueue(new Callback<MigsResonse>() {
+            @Override
+            public void onResponse(Call<MigsResonse> call, Response<MigsResonse> response) {
+                listener.onSuccess(response.body());
+            }
+
+            @Override
+            public void onFailure(Call<MigsResonse> call, Throwable t) {
+                listener.onFail(t);
+            }
+        });
+    }
 }

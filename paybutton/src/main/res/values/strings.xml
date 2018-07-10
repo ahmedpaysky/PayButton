@@ -74,4 +74,5 @@
     <string name="print">Print receipt</string>
     <string name="accepted_operation">Accepted Operation</string>
     <string name="confirm_receipt_info">Confirm receipt info</string>
+    <string name="enter_manual">Enter card data</string>
 </resources>

@@ -8,6 +8,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import io.paysky.ui.custom.PayButton;
+import io.paysky.util.AppUtils;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -56,6 +57,7 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
-
+        TextView appVersion = findViewById(R.id.app_version_textView);
+        appVersion.setText("PaySky PayButton Demo Version " + AppUtils.getVersionNumber(this));
     }
 }

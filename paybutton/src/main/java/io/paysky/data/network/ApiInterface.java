@@ -12,6 +12,8 @@ import io.paysky.data.model.response.MerchantDataResponse;
 import io.paysky.data.model.response.SendReceiptByMailResponse;
 import io.paysky.data.model.response.SmsPaymentResponse;
 import io.paysky.data.model.response.TransactionStatusResponse;
+import io.paysky.data.network.request.magnetic.MigsRequest;
+import io.paysky.data.network.response.MigsResonse;
 import okhttp3.ResponseBody;
 import retrofit2.Call;
 import retrofit2.http.Body;
@@ -45,5 +47,8 @@ public interface ApiInterface {
 
     @POST(ApiLinks.SMS_PAYMENT)
     Call<SmsPaymentResponse> requestToPay(@Body
-    SmsPaymentRequest request);
+                                                  SmsPaymentRequest request);
+
+    @POST(ApiLinks.MAGNETIC_PAYMENT)
+    Call<MigsResonse> payWithMagneticCard(@Body MigsRequest migsRequest);
 }

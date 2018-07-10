@@ -15,5 +15,6 @@ public interface ApiLinks {
     String CHECK_PAYMENT_STATUS = "Cube/PayLink.svc/api/CheckTxnStatus";
     String TERMINAL_CONFIG = "Portal/TerminalConfigurationFile/S{terminalId}.xml";
     String SMS_PAYMENT = "Cube/PayLink.svc/api/RequestToPay";
+    String MAGNETIC_PAYMENT = "Cube/mPOSHosting.svc/api/Execute";
 }
 

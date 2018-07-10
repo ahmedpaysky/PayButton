@@ -3,6 +3,7 @@ package io.paysky.util;
 import android.util.Log;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 import org.apache.commons.codec.DecoderException;
 import org.apache.commons.codec.binary.Hex;
@@ -22,6 +23,7 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import io.paysky.data.model.request.QrGenratorRequest;
+import io.paysky.data.network.request.magnetic.MigsRequest;
 
 /**
  * Created by Ahmed AL Agamy on 8/27/2017.
@@ -64,7 +66,7 @@ public class HashGenerator {
     }
 
 
-    public static String hashEmail(TreeMap<String, Object> data){
+    public static String hashEmail(TreeMap<String, Object> data) {
         try {
             String HASH_CODE = "583259473546523138394258464F5250415934534B59";
             return encode(HASH_CODE, getHashKeys(data));
@@ -143,6 +145,39 @@ public class HashGenerator {
         try {
             return stringBuilder.toString();
         } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+
+    public static String createHashData(MigsRequest migsRequest) {
+        String jsonRequest = new Gson().toJson(migsRequest.getPointOfSale());
+        try {
+            JSONObject jsonObject = new JSONObject(jsonRequest);
+            Iterator<String> keys = jsonObject.keys();
+            TreeSet<String> tree = new TreeSet<>();
+            while (keys.hasNext()) {
+                String keyName = keys.next();
+                if (keyName.equals("AmountTrxn") || keyName.equals("CardAcceptorIDcode")
+                        || keyName.equals("CardAcceptorTerminalID") || keyName.equals("DateTimeLocalTrxn")
+                        || keyName.equals("MessageTypeID") || keyName.equals("POSEntryMode")
+                        || keyName.equals("ProcessingCode") || keyName.equals("SystemTraceNr")) {
+                    tree.add(keyName);
+                }
+
+            }
+            StringBuilder stringBuilder = new StringBuilder();
+            int index = 0;
+            for (String key : tree) {
+                stringBuilder.append(key).append("=").append(jsonObject.get(key));
+                index++;
+                if (index < tree.size()) {
+                    stringBuilder.append("&");
+                }
+            }
+            return stringBuilder.toString();
+        } catch (JSONException e) {
             e.printStackTrace();
         }
         return null;

@@ -28,6 +28,7 @@ import io.card.payment.CreditCard;
 import io.paysky.ui.base.ActivityHelper;
 import io.paysky.ui.base.BaseFragment;
 import io.paysky.ui.custom.CardEditText;
+import io.paysky.ui.fragment.magnetic.MagneticPaymentFragment;
 import io.paysky.ui.fragment.paymentsuccess.PaymentApprovedFragment;
 import io.paysky.ui.fragment.qr.QrCodePaymentFragment;
 import io.paysky.util.AppConstant;
@@ -126,10 +127,21 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
         //SQ27
         //msm8610
         //qcom
-        String model = Build.MODEL;
         LinearLayout swipeLayout = view.findViewById(R.id.swipe_layout);
-        if (!model.equals("SQ27")) {
-            swipeLayout.setVisibility(View.GONE);
+        if (AppUtils.isPaymentMachine(getContext())) {
+            swipeLayout.setVisibility(View.VISIBLE);
+            swipeLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    // replace with magnetic fragment.
+                    Bundle bundle = new Bundle();
+                    bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId);
+                    bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
+                    bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount);
+                    bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
+                    activityHelper.replaceFragmentAndRemoveOldFragment(MagneticPaymentFragment.class, bundle);
+                }
+            });
         }
 
     }
@@ -162,11 +174,6 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
     private boolean isInputsValid(String cardNumber, String ownerName, String expireDate, String ccv) {
         boolean isValidInputs = true;
         if (isEmpty(cardNumber) || cardNumber.length() < 16) {
-            isValidInputs = false;
-            cardNumberEditText.setError(getString(R.string.invalid_card_number_length));
-        }
-
-        if (!cardNumberEditText.isValid()) {
             isValidInputs = false;
             cardNumberEditText.setError(getString(R.string.invalid_card_number_length));
         }
@@ -254,7 +261,7 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
 
     }
 
-    public void showTransactionApprovedFragment(String transactionNumber, String approvalCode, String retrievalRefNr) {
+    public void showTransactionApprovedFragment(String transactionNumber, String approvalCode, String retrievalRefNr, int amount) {
         Bundle bundle = new Bundle();
         bundle.putString(AppConstant.BundleKeys.TRANSACTION_ID, transactionNumber);
         bundle.putString(AppConstant.BundleKeys.AUTH_NUMBER, approvalCode);
@@ -263,6 +270,7 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
         bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
         bundle.putString(AppConstant.BundleKeys.REFERENCE_NUMBER, retrievalRefNr);
         bundle.putString(AppConstant.BundleKeys.TRANSACTION_CHANNEL, AppConstant.TransactionChannelName.CARD);
+        bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT , amount+"");
         activityHelper.replaceFragmentAndAddOldToBackStack(PaymentApprovedFragment.class, bundle);
     }
 }

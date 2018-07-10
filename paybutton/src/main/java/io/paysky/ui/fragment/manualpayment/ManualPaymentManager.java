@@ -37,7 +37,7 @@ public class ManualPaymentManager {
         paymentFragment.showProgress();
         // create request.
         ManualPaymentRequest paymentRequest = new ManualPaymentRequest();
-        int amount = (int) (Double.valueOf(payAmount) * 100);
+        final int amount = AppUtils.formatPaymentAmountToServer(payAmount);
         paymentRequest.amountTrxn = amount + "";
         paymentRequest.cardAcceptorIDcode = merchantId;
         paymentRequest.cardAcceptorTerminalID = terminalId;
@@ -85,7 +85,7 @@ public class ManualPaymentManager {
                         // transaction success.
                         transaction.setSuccessTransactionId(response.transactionNo,
                                 response.actionCode + " " + response.message, response.approvalCode);
-                        paymentFragment.showTransactionApprovedFragment(response.transactionNo, response.approvalCode, response.retrievalRefNr);
+                        paymentFragment.showTransactionApprovedFragment(response.transactionNo, response.approvalCode, response.retrievalRefNr , amount);
                     }
                 }
             }

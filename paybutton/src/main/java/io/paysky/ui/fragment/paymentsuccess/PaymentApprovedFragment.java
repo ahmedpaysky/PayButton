@@ -11,6 +11,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.format.Time;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -37,11 +38,11 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
     private String terminalId;
     private String merchantId;
     private String referenceNumber;
+    private String paidAmount;
     //Objects.
     private ActivityHelper activityHelper;
     private PaymentApprovedManager paymentApprovedManager;
     //GUI.
-    private TableRow closePrintLayout;
     private EditText emailEditText;
     private ProgressDialog progressDialog;
     private LinearLayout sendEmailLayout, sendEmailNotificationLayout, sendEmailSuccessLayout, receiptLayout;
@@ -63,7 +64,6 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
             throw new IllegalStateException("activity must implement " + ActivityHelper.class.getSimpleName());
         }
         extractBundle();
-
         paymentApprovedManager = new PaymentApprovedManager(this);
     }
 
@@ -76,6 +76,7 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
         terminalId = bundle.getString(AppConstant.BundleKeys.TERMINAL_ID);
         referenceNumber = bundle.getString(AppConstant.BundleKeys.REFERENCE_NUMBER);
         transactionChannel = bundle.getString(AppConstant.BundleKeys.TRANSACTION_CHANNEL);
+        paidAmount = bundle.getString(AppConstant.BundleKeys.PAY_AMOUNT);
     }
 
     @Override
@@ -97,8 +98,42 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
     }
 
     public void printReceiptButtonClick() {
-        receiptLayout.buildDrawingCache(false);
-        Bitmap myBitmap = receiptLayout.getDrawingCache();
+        // set data to receipt layout, to print it.
+        TextView merchantIdTextView = receiptLayout.findViewById(R.id.receipt_mid);
+        merchantIdTextView.setText(String.format("MID: %s", merchantId));
+        TextView terminalIdTextView = receiptLayout.findViewById(R.id.receipt_tid);
+        terminalIdTextView.setText(String.format("TID: %s", terminalId));
+        TextView receiptNumberTextView = receiptLayout.findViewById(R.id.receipt_number);
+        receiptNumberTextView.setText(String.format("Receipt NO: %s", transactionId));
+        TextView amountTextView = receiptLayout.findViewById(R.id.receipt_amount);
+        StringBuilder formattedAmount = new StringBuilder();
+        for (int i = 0; i < paidAmount.length(); i++) {
+            if (i == 2) {
+                formattedAmount.append(".");
+            }
+            formattedAmount.append(paidAmount.charAt(i));
+        }
+        formattedAmount.append(" EGP");
+        amountTextView.setText(String.format("Amount: %s", formattedAmount.toString()));
+        TextView transactionTypeTextView = receiptLayout.findViewById(R.id.receipt_transaction_type);
+        transactionTypeTextView.setText("Transaction type: SALE");
+        Time today = new Time(Time.getCurrentTimezone());
+        today.setToNow();
+        TextView dateTextView = receiptLayout.findViewById(R.id.receipt_date);
+        dateTextView.setText(String.format("Date: %d-%d-%d", today.monthDay, today.month, today.year));
+        TextView timeTextView = receiptLayout.findViewById(R.id.receipt_time);
+        timeTextView.setText(String.format("Time: %d:%d", today.hour, today.minute));
+        // get layout image to print.
+        receiptLayout.setDrawingCacheEnabled(true);
+        // this is the important code :)
+        // Without it the view will have a dimension of 0,0 and the bitmap will be null
+        receiptLayout.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+        receiptLayout.layout(0, 0, receiptLayout.getMeasuredWidth(), receiptLayout.getMeasuredHeight());
+
+        receiptLayout.buildDrawingCache(true);
+        Bitmap myBitmap = Bitmap.createBitmap(receiptLayout.getDrawingCache());
+        receiptLayout.setDrawingCacheEnabled(false); // clear drawing cache
         // print image.
         PrinterManager printer = new PrinterManager();
         printer.setupPage(384, -1);
@@ -134,13 +169,18 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
         authNumberTextView.setText(getString(R.string.auth_number) + " #" + referenceNumber);
         TextView trxIdTextView = view.findViewById(R.id.trx_id_textView);
         trxIdTextView.setText(getString(R.string.trx_id) + " #" + transactionId);
-        closePrintLayout = view.findViewById(R.id.close_print_layout);
         Button closeButton = view.findViewById(R.id.close_button);
         closeButton.setOnClickListener(this);
-        Button sendReceiptButton = view.findViewById(R.id.send_receipt_button);
-        int visibilitySate = (AppUtils.isPOSDevice()) ? View.VISIBLE : View.GONE;
-        sendReceiptButton.setVisibility(visibilitySate);
-        sendReceiptButton.setOnClickListener(this);
+        Button printReceipt = view.findViewById(R.id.print_receipt);
+        receiptLayout = view.findViewById(R.id.layout);
+        if (AppUtils.isPaymentMachine(getContext())) {
+            printReceipt.setVisibility(View.VISIBLE);
+            printReceipt.setOnClickListener(this);
+            receiptLayout.setVisibility(View.INVISIBLE);
+        } else {
+            printReceipt.setVisibility(View.GONE);
+            receiptLayout.setVisibility(View.GONE);
+        }
         emailEditText = view.findViewById(R.id.email_editText);
         Button sendEmailButton = view.findViewById(R.id.send_email_button);
         sendEmailButton.setOnClickListener(this);
@@ -148,14 +188,10 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
         sendEmailNotificationLayout = view.findViewById(R.id.send_email_notification);
         sendEmailSuccessLayout = view.findViewById(R.id.sent_email_success_layout);
         mailSentTextView = view.findViewById(R.id.mail_sent_textView);
-        receiptLayout = view.findViewById(R.id.layout);
-        Button closeButton2 = view.findViewById(R.id.close_view_button);
-        closeButton2.setOnClickListener(this);
         if (receiverMail != null) {
             hideSendNotificationEmailLayout();
             hideSendEmailLayout();
         } else {
-            hidePrintReceiptLayout();
             showSendNotificationEmailLayout();
             showSendEmailLayout();
         }
@@ -164,11 +200,11 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
     @Override
     public void onClick(View view) {
         int i = view.getId();
-        if (i == R.id.close_button || i == R.id.close_view_button) {
+        if (i == R.id.close_button) {
             getActivity().finish();
         } else if (i == R.id.send_email_button) {
             sendEmailButtonClick();
-        } else if (i == R.id.send_receipt_button) {
+        } else if (i == R.id.print_receipt) {
             printReceiptButtonClick();
         }
     }
@@ -218,9 +254,6 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
         sendEmailSuccessLayout.setVisibility(View.VISIBLE);
     }
 
-    private void hidePrintReceiptLayout() {
-        closePrintLayout.setVisibility(View.GONE);
-    }
 
     public void setSendEmailSuccess(String email, int operationType) {
         String sendMail = getString(R.string.mail_sent_to) + " " + email;
