@@ -1,7 +1,6 @@
 package io.paysky.util;
 
 
-
 public interface AppConstant {
 
 
@@ -13,12 +12,22 @@ public interface AppConstant {
         String MERCHANT_ID = "merchant_id";
         String RECEIVER_MAIL = "receiver_mail";
         String AUTH_NUMBER = "auth_number";
-        String PAY_AMOUNT ="pay_amount";
+        String PAY_AMOUNT = "pay_amount";
+        String ENABLE_MANUAL = "manual";
+        String ENABLE_MAGNETIC = "magnetic";
+        String ENABLE_QR = "qr_reader";
+        String DEFAULT_PAYMENT = "default_payment";
+        String SERVER_LINK = "payment_link";
     }
 
 
-    interface TransactionChannelName{
+    interface TransactionChannelName {
         String CARD = "Card";
-        String TAHWEEL ="Tahweel";
+        String TAHWEEL = "Tahweel";
+    }
+
+
+    interface PaymentMethods {
+        int MANUAL = 1, MAGNETIC = 2, QR_READER = 3;
     }
 }

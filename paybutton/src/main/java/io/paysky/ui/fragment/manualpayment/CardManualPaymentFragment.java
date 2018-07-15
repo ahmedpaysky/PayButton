@@ -4,7 +4,6 @@ package io.paysky.ui.fragment.manualpayment;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -15,7 +14,7 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
+import android.widget.TableRow;
 
 import com.example.paybutton.R;
 
@@ -47,9 +46,15 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
     private EditText expireDateEditText;
     private EditText ccvEditText;
     private ProgressDialog progressDialog;
+    private TableRow paymentsRaw;
+    private View walletPaymentLayout;
+    private View readCardWithMagnetic;
     //Variables.
     private String terminalId, merchantId;
     private String payAmount, receiverMail;
+    private boolean enableQr, enableMagnetic, enableManual;
+    private int defaultPayment;
+
 
     public CardManualPaymentFragment() {
         // Required empty public constructor
@@ -74,6 +79,10 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
         merchantId = arguments.getString(AppConstant.BundleKeys.MERCHANT_ID);
         payAmount = arguments.getString(AppConstant.BundleKeys.PAY_AMOUNT);
         receiverMail = arguments.getString(AppConstant.BundleKeys.RECEIVER_MAIL);
+        enableMagnetic = arguments.getBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC);
+        enableManual = arguments.getBoolean(AppConstant.BundleKeys.ENABLE_MANUAL);
+        enableQr = arguments.getBoolean(AppConstant.BundleKeys.ENABLE_QR);
+        defaultPayment = arguments.getInt(AppConstant.BundleKeys.DEFAULT_PAYMENT);
     }
 
     @Override
@@ -87,6 +96,54 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initView(view);
+        showViewsBasedOnUserPrefs();
+    }
+
+    private void showViewsBasedOnUserPrefs() {
+        if (enableQr) {
+            walletPaymentLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId);
+                    bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
+                    bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount);
+                    bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
+                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQr);
+                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagnetic);
+                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManual);
+                    bundle.putInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, defaultPayment);
+                    activityHelper.replaceFragmentAndRemoveOldFragment(QrCodePaymentFragment.class, bundle);
+                }
+            });
+        } else {
+            paymentsRaw.setVisibility(View.GONE);
+        }
+
+
+        if (enableMagnetic) {
+            if (AppUtils.isPaymentMachine(getContext())) {
+                readCardWithMagnetic.setVisibility(View.VISIBLE);
+                readCardWithMagnetic.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // replace with magnetic fragment.
+                        Bundle bundle = new Bundle();
+                        bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId);
+                        bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
+                        bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount);
+                        bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
+                        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQr);
+                        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagnetic);
+                        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManual);
+                        bundle.putInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, defaultPayment);
+                        activityHelper.replaceFragmentAndRemoveOldFragment(MagneticPaymentFragment.class, bundle);
+                    }
+                });
+            }
+        } else {
+            readCardWithMagnetic.setVisibility(View.GONE);
+        }
     }
 
     private void initView(View view) {
@@ -105,18 +162,7 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
         ccvEditText = view.findViewById(R.id.ccv_editText);
         Button proceedButton = view.findViewById(R.id.proceed_button);
         proceedButton.setOnClickListener(this);
-        LinearLayout walletPaymentLayout = view.findViewById(R.id.wallet_payment_layout);
-        walletPaymentLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId);
-                bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
-                bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount);
-                bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
-                activityHelper.replaceFragmentAndRemoveOldFragment(QrCodePaymentFragment.class, bundle);
-            }
-        });
+        walletPaymentLayout = view.findViewById(R.id.wallet_payment_layout);
         ImageView scanCardWithCameraImageView = view.findViewById(R.id.scan_camera_imageView);
         scanCardWithCameraImageView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,26 +170,9 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
                 onScanCardCameraButtonClick();
             }
         });
-        //SQ27
-        //msm8610
-        //qcom
-        LinearLayout swipeLayout = view.findViewById(R.id.swipe_layout);
-        if (AppUtils.isPaymentMachine(getContext())) {
-            swipeLayout.setVisibility(View.VISIBLE);
-            swipeLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    // replace with magnetic fragment.
-                    Bundle bundle = new Bundle();
-                    bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId);
-                    bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
-                    bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount);
-                    bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
-                    activityHelper.replaceFragmentAndRemoveOldFragment(MagneticPaymentFragment.class, bundle);
-                }
-            });
-        }
 
+        readCardWithMagnetic = view.findViewById(R.id.swipe_layout);
+        paymentsRaw = view.findViewById(R.id.payments_row);
     }
 
 
@@ -270,7 +299,7 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
         bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
         bundle.putString(AppConstant.BundleKeys.REFERENCE_NUMBER, retrievalRefNr);
         bundle.putString(AppConstant.BundleKeys.TRANSACTION_CHANNEL, AppConstant.TransactionChannelName.CARD);
-        bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT , amount+"");
+        bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, amount + "");
         activityHelper.replaceFragmentAndAddOldToBackStack(PaymentApprovedFragment.class, bundle);
     }
 }

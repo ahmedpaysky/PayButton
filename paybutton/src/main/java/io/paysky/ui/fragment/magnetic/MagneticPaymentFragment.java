@@ -25,6 +25,7 @@ import io.paysky.ui.dialog.InfoDialog;
 import io.paysky.ui.fragment.manualpayment.CardManualPaymentFragment;
 import io.paysky.ui.fragment.paymentfail.PaymentFailedFragment;
 import io.paysky.ui.fragment.paymentsuccess.PaymentApprovedFragment;
+import io.paysky.ui.fragment.qr.QrCodePaymentFragment;
 import io.paysky.util.AppConstant;
 import io.paysky.util.AppUtils;
 import io.paysky.util.HashGenerator;
@@ -37,15 +38,23 @@ import io.paysky.util.TrackData;
 public class MagneticPaymentFragment extends BaseFragment {
 
 
+    //GUI.
+    private ProgressDialog progressDialog;
+
+    //Objects,
     private ActivityHelper activityHelper;
     private MagneticCardReaderService cardReaderService;
+    //Objects.
+    private Handler magneticHandler;
+    //Variables/
+    private boolean enableQr, enableMagnetic, enableManual;
+    private int defaultPayment;
     private String terminalId;
     private String merchantId;
     private String payAmount;
     private String receiverMail;
-    private TrackData trackData;
-    private ProgressDialog progressDialog;
-
+    private View manualLayout;
+    private View qrLayout;
 
     public MagneticPaymentFragment() {
         // Required empty public constructor
@@ -60,25 +69,21 @@ public class MagneticPaymentFragment extends BaseFragment {
             throw new IllegalStateException("activity must implement " + ActivityHelper.class.getSimpleName());
         }
 
-        Handler magneticHandler = new Handler() {
+        magneticHandler = new Handler() {
             @Override
             public void handleMessage(android.os.Message msg) {
                 int x = msg.what;
                 switch (x) {
                     case MagneticCardReaderService.MESSAGE_READ_MAG:
                         TrackData trackData = msg.getData().getParcelable(MagneticCardReaderService.CARD_TRACK_DATA);
-                        if (trackData.getTrackLenght() != 2) {
-                            return;
-                        }
                         createTransaction(trackData);
                 }
             }
         };
-        cardReaderService = new MagneticCardReaderService(getActivity(), magneticHandler);
+        cardReaderService = new MagneticCardReaderService();
         extractBundle();
         progressDialog = AppUtils.createProgressDialog(getActivity(), R.string.please_wait);
     }
-
 
 
     private void extractBundle() {
@@ -87,6 +92,10 @@ public class MagneticPaymentFragment extends BaseFragment {
         merchantId = arguments.getString(AppConstant.BundleKeys.MERCHANT_ID);
         payAmount = arguments.getString(AppConstant.BundleKeys.PAY_AMOUNT);
         receiverMail = arguments.getString(AppConstant.BundleKeys.RECEIVER_MAIL);
+        enableMagnetic = arguments.getBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC);
+        enableManual = arguments.getBoolean(AppConstant.BundleKeys.ENABLE_MANUAL);
+        enableQr = arguments.getBoolean(AppConstant.BundleKeys.ENABLE_QR);
+        defaultPayment = arguments.getInt(AppConstant.BundleKeys.DEFAULT_PAYMENT);
     }
 
     @Override
@@ -100,28 +109,59 @@ public class MagneticPaymentFragment extends BaseFragment {
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initView(view);
+        showViewsBasedOnUserPrefs();
+    }
+
+    private void showViewsBasedOnUserPrefs() {
+        if (enableManual) {
+            manualLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId + "");
+                    bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId + "");
+                    bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount + "");
+                    bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
+                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQr);
+                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagnetic);
+                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManual);
+                    bundle.putInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, defaultPayment);
+                    activityHelper.replaceFragmentAndRemoveOldFragment(CardManualPaymentFragment.class, bundle);
+                }
+            });
+        } else {
+            manualLayout.setVisibility(View.GONE);
+        }
+        if (enableQr) {
+            qrLayout.setVisibility(View.VISIBLE);
+            qrLayout.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    Bundle bundle = new Bundle();
+                    bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId + "");
+                    bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId + "");
+                    bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount + "");
+                    bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
+                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQr);
+                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagnetic);
+                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManual);
+                    bundle.putInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, defaultPayment);
+                    activityHelper.replaceFragmentAndRemoveOldFragment(QrCodePaymentFragment.class, bundle);
+                }
+            });
+        }
     }
 
     private void initView(View view) {
-        LinearLayout manualLayout = view.findViewById(R.id.manual_layout);
-        manualLayout.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Bundle bundle = new Bundle();
-                bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId + "");
-                bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId + "");
-                bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount + "");
-                bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
-                activityHelper.replaceFragmentAndRemoveOldFragment(CardManualPaymentFragment.class, bundle);
-            }
-        });
+        manualLayout = view.findViewById(R.id.manual_payment_layout);
+        qrLayout = view.findViewById(R.id.qr_payment_layout);
     }
 
 
     @Override
     public void onStart() {
         super.onStart();
-        cardReaderService.start();
+        cardReaderService.start(magneticHandler);
     }
 
     @Override

@@ -75,4 +75,6 @@
     <string name="accepted_operation">عمليه مقبوله</string>
     <string name="confirm_receipt_info">تأكيد بيانات الايصال</string>
     <string name="enter_manual">ادخل بيانات الكارت</string>
+    <string name="no_payment_selected">لم يتم اختيار طريقه الدفع.</string>
+    <string name="read_qr">إقرأ كود الدفع</string>
 </resources>

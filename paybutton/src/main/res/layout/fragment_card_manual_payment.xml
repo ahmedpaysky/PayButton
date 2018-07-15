@@ -11,12 +11,13 @@
         tools:context="io.paysky.ui.fragment.manualpayment.CardManualPaymentFragment">
 
         <TableRow
+            android:id="@+id/payments_row"
             android:layout_marginEnd="12dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="@dimen/_6sdp">
 
             <LinearLayout
-                android:id="@+id/card_payment_layout"
+                android:id="@+id/card_manual_payment_layout"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/_34sdp"
                 android:layout_marginEnd="4dp"

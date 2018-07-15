@@ -75,4 +75,6 @@
     <string name="accepted_operation">Accepted Operation</string>
     <string name="confirm_receipt_info">Confirm receipt info</string>
     <string name="enter_manual">Enter card data</string>
+    <string name="no_payment_selected">No payment method selected.</string>
+    <string name="read_qr">Read Qr code</string>
 </resources>

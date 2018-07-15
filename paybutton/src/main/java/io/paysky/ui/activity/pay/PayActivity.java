@@ -1,5 +1,6 @@
 package io.paysky.ui.activity.pay;
 
+import android.app.Dialog;
 import android.app.ProgressDialog;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -16,10 +17,15 @@ import java.text.DecimalFormat;
 
 import io.paysky.data.event.PaymentStatusEvent;
 import io.paysky.data.model.response.MerchantDataResponse;
+import io.paysky.data.network.ApiLinks;
 import io.paysky.ui.base.ActivityHelper;
 import io.paysky.ui.base.BaseActivity;
 import io.paysky.ui.base.PaymentTransaction;
+import io.paysky.ui.dialog.DialogButtonClick;
+import io.paysky.ui.dialog.InfoDialog;
+import io.paysky.ui.fragment.magnetic.MagneticPaymentFragment;
 import io.paysky.ui.fragment.manualpayment.CardManualPaymentFragment;
+import io.paysky.ui.fragment.qr.QrCodePaymentFragment;
 import io.paysky.util.AppCache;
 import io.paysky.util.AppConstant;
 import io.paysky.util.AppUtils;
@@ -40,12 +46,15 @@ public class PayActivity extends BaseActivity
     private MerchantDataResponse merchantData;
     private Throwable failTransactionException;
     private PayActivityManager payActivityManager;
+    private Bundle extras;
     //Variables.
     private long merchantId;
     private long terminalId;
     private String payAmount;
     private String receiverMail;
     private String referenceNumber, responseCode, authorizationCode;
+    private boolean enableManual, enableMagnetic, enableQr;
+    private int defaultPayment;
 
 
     @Override
@@ -62,9 +71,87 @@ public class PayActivity extends BaseActivity
         extractDataFromBundle();
         initView();
         checkMerchantDataExistence();
-        showPayByManualCardFragment();
+        showUserNeededPaymentMethod();
     }
 
+    private void showUserNeededPaymentMethod() {
+        if (!enableManual && !enableMagnetic && !enableQr) {
+            InfoDialog infoDialog = new InfoDialog(this).setDialogText(R.string.no_payment_selected)
+                    .setButtonText(R.string.ok).setButtonClickListener(new DialogButtonClick() {
+                        @Override
+                        public void onButtonClick(Dialog dialog) {
+                            dialog.dismiss();
+                            finish();
+                        }
+                    });
+            infoDialog.setCancelable(false);
+            infoDialog.showDialog();
+            return;
+        } else {
+            // check default payment method.
+            defaultPayment = extras.getInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, -1);
+            if (defaultPayment == -1) {
+                // not select default payment , make one of them as default.
+                if (enableManual) {
+                    defaultPayment = AppConstant.PaymentMethods.MANUAL;
+                } else if (enableMagnetic) {
+                    defaultPayment = AppConstant.PaymentMethods.MAGNETIC;
+                } else {
+                    defaultPayment = AppConstant.PaymentMethods.QR_READER;
+                }
+            }
+        }
+        if (defaultPayment == AppConstant.PaymentMethods.MANUAL) {
+            showPayByManualCardFragment();
+        } else if (defaultPayment == AppConstant.PaymentMethods.MAGNETIC) {
+            showMagneticReaderFragment();
+        } else {
+            showQrReaderFragment();
+        }
+    }
+
+    private void showQrReaderFragment() {
+        Bundle bundle = new Bundle();
+        bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId + "");
+        bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId + "");
+        bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount + "");
+        bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
+        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQr);
+        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagnetic);
+        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManual);
+        bundle.putInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, defaultPayment);
+        // show Qr Fragment.
+        replaceFragmentAndRemoveOldFragment(QrCodePaymentFragment.class, bundle);
+    }
+
+    private void showMagneticReaderFragment() {
+        Bundle bundle = new Bundle();
+        bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId + "");
+        bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId + "");
+        bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount + "");
+        bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
+        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQr);
+        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagnetic);
+        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManual);
+        bundle.putInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, defaultPayment);
+        // show magnetic fragment.
+        replaceFragmentAndRemoveOldFragment(MagneticPaymentFragment.class, bundle);
+    }
+
+
+    private void showPayByManualCardFragment() {
+        Bundle bundle = new Bundle();
+        bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId + "");
+        bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId + "");
+        bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount + "");
+        bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
+        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQr);
+        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagnetic);
+        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManual);
+        bundle.putInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, defaultPayment);
+        // show manual payment fragment.
+        replaceFragmentAndRemoveOldFragment(CardManualPaymentFragment.class, bundle);
+    }
 
     private void makeActivityFullScreen() {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
@@ -106,24 +193,19 @@ public class PayActivity extends BaseActivity
     }
 
 
-    private void showPayByManualCardFragment() {
-        Bundle bundle = new Bundle();
-        bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId + "");
-        bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId + "");
-        bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount + "");
-        bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
-        // show manual payment fragment.
-        replaceFragmentAndRemoveOldFragment(CardManualPaymentFragment.class, bundle);
-    }
-
     private void extractDataFromBundle() {
-        Bundle extras = getIntent().getExtras();
+        extras = getIntent().getExtras();
         merchantId = extras.getLong(AppConstant.BundleKeys.MERCHANT_ID, 0);
         terminalId = extras.getLong(AppConstant.BundleKeys.TERMINAL_ID, 0);
         double payAmount = extras.getDouble(AppConstant.BundleKeys.PAY_AMOUNT);
         DecimalFormat format = new DecimalFormat("0.00");
         this.payAmount = AppUtils.convertToEnglishDigits(format.format(payAmount));
         receiverMail = extras.getString(AppConstant.BundleKeys.RECEIVER_MAIL, null);
+        // get payment config params.
+        enableManual = extras.getBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, false);
+        enableMagnetic = extras.getBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, false);
+        enableQr = extras.getBoolean(AppConstant.BundleKeys.ENABLE_QR, false);
+        ApiLinks.MAIN_LINK = extras.getString(AppConstant.BundleKeys.SERVER_LINK, ApiLinks.MAIN_LINK);
     }
 
     private void showMerchantData() {

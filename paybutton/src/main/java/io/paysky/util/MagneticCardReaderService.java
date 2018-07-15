@@ -5,68 +5,58 @@ import android.device.MagManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 
 public class MagneticCardReaderService {
 
-    public final static int MESSAGE_OPEN_MAG = 1;
-    public final static int MESSAGE_CHECK_FAILE = 2;
+    private final static int MESSAGE_CHECK_FAILE = 2;
     public final static int MESSAGE_READ_MAG = 3;
-    public final static int MESSAGE_CHECK_OK = 4;
     public final static String CARD_TRACK_DATA = "card_data";
-  /*  public final static String CARD_NUMBER = "number";
-    public final static String CARD_TRACK2 = "track2";
-    public final static String CARD_TRACK3 = "track3";
-    public final static String CARD_VALIDTIME = "validtime";*/
 
-    private Context mContext;
     private Handler mHandler;
     private MagManager magManager;
     private MagReaderThread magReaderThread;
     private static final int DEFAULT_TAG = 1;
-    private byte[] magBuffer = new byte[1024];
 
-    public MagneticCardReaderService(Context context, Handler handler) {
-        mHandler = handler;
-        mContext = context;
+    public MagneticCardReaderService() {
         magManager = new MagManager();
     }
 
     // 从字节数组到十六进制字符串转换
     public static String Bytes2HexString(byte[] b) {
-        String ret = "";
+        StringBuilder ret = new StringBuilder();
 
         String hex = "";
-        for (int i = 0; i < b.length; i++) {
-            hex = Integer.toHexString(b[i] & 0xFF);
+        for (byte aB : b) {
+            hex = Integer.toHexString(aB & 0xFF);
             if (hex.length() == 1) {
                 hex = '0' + hex;
             }
-            // ret.append(hex.toUpperCase());
-            ret += hex.toUpperCase();
+            ret.append(hex.toUpperCase());
         }
 
-        return ret;
+        return ret.toString();
     }
 
-    public synchronized void start() {
+    public void start(Handler magneticHandler) {
         if (magReaderThread != null) {
             magReaderThread.stopMagReader();
             magReaderThread = null;
         }
+        mHandler = magneticHandler;
         magReaderThread = new MagReaderThread("reader--" + DEFAULT_TAG);
         magReaderThread.start();
     }
 
-    public synchronized void stop() {
+    public void stop() {
         if (magManager != null) {
             magManager.close();
-            //magManager = null;
         }
         if (magReaderThread != null) {
             magReaderThread.stopMagReader();
             magReaderThread = null;
         }
-
+        mHandler = null;
     }
 
     private class MagReaderThread extends Thread {
@@ -83,56 +73,43 @@ public class MagneticCardReaderService {
 
         public void run() {
             if (magManager != null) {
-                int ret = magManager.open();
-                if (ret != 0) {
-                    mHandler.sendEmptyMessage(MESSAGE_OPEN_MAG);
-                    return;
-                }
+                magManager.open();
             }
             while (running) {
-                if (magManager == null)
-                    return;
-                int ret = magManager.checkCard();
-                if (ret != 0) {
-                    mHandler.sendEmptyMessage(MESSAGE_CHECK_FAILE);
-                    try {
-                        Thread.sleep(2000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    continue;
-                } else {
-                    mHandler.sendEmptyMessage(MESSAGE_CHECK_OK);
+                int ret = 0;
+                if (magManager != null) {
+                    ret = magManager.checkCard();
                 }
-                StringBuffer trackOne = new StringBuffer();
-                byte[] stripInfo = new byte[1024];
-                int allLen = magManager.getAllStripInfo(stripInfo);
+                if (ret != 0) {
+                    continue;
+                }
+                byte[] stripInfo = new byte[2056];
+                int allLen = magManager != null ? magManager.getAllStripInfo(stripInfo) : 0;
+
+                TrackData trackData = new TrackData();
+
                 if (allLen > 0) {
+                    Log.d("track", "len > 0");
                     int len = stripInfo[1];
                     if (len != 0) {
-                        trackOne.append(new String(stripInfo, 2, len));
-                        trackOne.append("\n");
+                        trackData.track1 = new String(stripInfo, 2, len);
+                        Log.d("track", trackData.track1 + "");
                     }
                     int len2 = stripInfo[3 + len];
                     if (len2 != 0) {
-                        trackOne.append(new String(stripInfo, 4 + len, len2));
-                        trackOne.append("\n");
-                    }
-                    int len3 = stripInfo[5 + len + len2];
-                    if (len3 != 0 && len3 < 1024) {
-                        trackOne.append(new String(stripInfo, 6 + len + len2, len3));
-                        trackOne.append("\n");
+                        trackData.track2 = new String(stripInfo, 4 + len, len2);
+                        Log.d("track", trackData.track2 + "");
                     }
 
-                    if (!trackOne.toString().equals("")) {
-                        mHandler.removeMessages(MESSAGE_CHECK_FAILE);
-                        Message msg = mHandler.obtainMessage(MESSAGE_READ_MAG);
-                        TrackData trackData = new TrackData(trackOne.toString());
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable(CARD_TRACK_DATA, trackData);
-                        msg.setData(bundle);
-                        mHandler.sendMessage(msg);
-                    }
+                    String[] track2Spilt = trackData.track2.split("=");
+                    trackData.CardNumber = track2Spilt[0];
+                    trackData.ExpiryData = track2Spilt[1].substring(0, 4);
+                    //    mHandler.removeMessages(MESSAGE_CHECK_FAILE);
+                    Message msg = mHandler.obtainMessage(MESSAGE_READ_MAG);
+                    Bundle bundle = new Bundle();
+                    bundle.putParcelable(CARD_TRACK_DATA, trackData);
+                    msg.setData(bundle);
+                    mHandler.sendMessage(msg);
                 }
             }
 

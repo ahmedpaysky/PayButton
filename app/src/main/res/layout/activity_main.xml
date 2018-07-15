@@ -124,9 +124,9 @@
             android:id="@+id/paybtn"
             android:layout_width="match_parent"
             android:layout_height="@dimen/_38sdp"
-            android:gravity="center"
             android:layout_marginTop="@dimen/_8sdp"
-            android:background="@drawable/button_blue_selector" />
+            android:background="@drawable/button_blue_selector"
+            android:gravity="center" />
 
 
         <TextView
@@ -139,6 +139,7 @@
     </LinearLayout>
 
     <ImageView
+        android:id="@+id/logo_imageView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

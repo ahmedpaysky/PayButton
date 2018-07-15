@@ -23,6 +23,7 @@ public class InfoDialog extends Dialog implements View.OnClickListener {
     private TextView dialogTitleTextView;
     private TextView dialogContentTextView;
     private Button dialogButton;
+    private DialogButtonClick buttonClickListener;
 
     public InfoDialog(@NonNull Context context) {
         super(context);
@@ -61,14 +62,22 @@ public class InfoDialog extends Dialog implements View.OnClickListener {
         return this;
     }
 
+    public InfoDialog setButtonClickListener(DialogButtonClick buttonClickListener) {
+        this.buttonClickListener = buttonClickListener;
+        return this;
+    }
 
     public void showDialog() {
-        show();
+        if (buttonClickListener != null) {
+            buttonClickListener.onButtonClick(this);
+        } else {
+            dismiss();
+        }
     }
 
 
     @Override
     public void onClick(View view) {
-        dismiss();
+
     }
 }

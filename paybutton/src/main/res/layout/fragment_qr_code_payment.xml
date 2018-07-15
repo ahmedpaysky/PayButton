@@ -14,7 +14,32 @@
         android:layout_marginTop="@dimen/_6sdp">
 
         <LinearLayout
-            android:id="@+id/card_payment_layout"
+            android:id="@+id/magnetic_payment_layout"
+            android:layout_width="0dp"
+            android:layout_height="@dimen/_34sdp"
+            android:layout_marginEnd="4dp"
+            android:layout_weight="1"
+            android:background="@drawable/payment_option_unselected"
+            android:button="@null"
+            android:checked="true"
+            android:drawableStart="@drawable/ic_card"
+            android:gravity="center"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/qr_payment_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:drawablePadding="8dp"
+                android:drawableStart="@drawable/ic_card_black"
+                android:gravity="center_vertical"
+                android:text="@string/card"
+                android:textColor="#2D3134" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/card_manual_payment_layout"
             android:layout_width="0dp"
             android:layout_height="@dimen/_34sdp"
             android:layout_marginEnd="4dp"
@@ -128,7 +153,7 @@
             android:layout_weight="1"
             android:text="@string/cant_scan_code"
             android:textColor="#2d3134"
-            android:textSize="@dimen/_11sdp" />
+            android:textSize="@dimen/_10sdp" />
 
 
         <LinearLayout
@@ -144,7 +169,7 @@
                 android:layout_height="@dimen/_31sdp"
                 android:background="@drawable/baybutton_proceed_button"
                 android:text="@string/request_payment"
-                android:textSize="@dimen/_11sdp" />
+                android:textSize="@dimen/_10sdp" />
         </LinearLayout>
 
     </LinearLayout>

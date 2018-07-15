@@ -14,6 +14,7 @@ import com.example.paybutton.R;
 
 import io.paysky.data.event.PaymentStatusEvent;
 import io.paysky.ui.activity.pay.PayActivity;
+import io.paysky.util.AppConstant;
 import io.paysky.util.PaymentObservable;
 import io.paysky.util.PaymentObserver;
 
@@ -30,6 +31,50 @@ public class PayButton extends LinearLayout implements PaymentObserver {
     Double payAmount = 0.0;
     int currencyCode = 0;
     String notificationValue = null;
+
+    public boolean isEnableManualPayment() {
+        return enableManualPayment;
+    }
+
+    public void setEnableManualPayment(boolean enableManualPayment) {
+        this.enableManualPayment = enableManualPayment;
+    }
+
+    public boolean isEnableMagneticPayment() {
+        return enableMagneticPayment;
+    }
+
+    public void setEnableMagneticPayment(boolean enableMagneticPayment) {
+        this.enableMagneticPayment = enableMagneticPayment;
+    }
+
+    public boolean isEnableQrPayment() {
+        return enableQrPayment;
+    }
+
+    public void setEnableQrPayment(boolean enableQrPayment) {
+        this.enableQrPayment = enableQrPayment;
+    }
+
+    public int getDefaultPayment() {
+        return defaultPayment;
+    }
+
+    public void setDefaultPayment(int defaultPayment) {
+        this.defaultPayment = defaultPayment;
+    }
+
+    public String getServerLink() {
+        return serverLink;
+    }
+
+    public void setServerLink(String serverLink) {
+        this.serverLink = serverLink;
+    }
+
+    private boolean enableManualPayment, enableMagneticPayment, enableQrPayment;
+    private String serverLink;
+    private int defaultPayment;
     //Objects.
     PaymentTransactionCallback transactionCallback;
     NotificationType notificationType;
@@ -54,7 +99,6 @@ public class PayButton extends LinearLayout implements PaymentObserver {
         super(context, attrs, defStyleAttr, defStyleRes);
         inflateView();
     }
-
 
 
     public void setMerchantId(long merchantId) {
@@ -110,6 +154,11 @@ public class PayButton extends LinearLayout implements PaymentObserver {
         bundle.putLong("merchant_id", merchantId);
         bundle.putDouble("pay_amount", payAmount);
         bundle.putString("receiver_mail", notificationValue);
+        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManualPayment);
+        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagneticPayment);
+        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQrPayment);
+        bundle.putInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, defaultPayment);
+        bundle.putString(AppConstant.BundleKeys.SERVER_LINK, serverLink);
         Intent intent = new Intent(getContext(), PayActivity.class);
         intent.putExtras(bundle);
         //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
