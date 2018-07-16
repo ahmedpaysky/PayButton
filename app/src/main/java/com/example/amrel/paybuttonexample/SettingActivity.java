@@ -48,7 +48,7 @@ public class SettingActivity extends AppCompatActivity implements View.OnClickLi
         saveButton.setOnClickListener(this);
         links = new ArrayList<>();
         links.add("http://197.50.37.116:4006/");
-        links.add("http://197.50.37.116:4006/");
+        links.add("http://grey.paysky.io:4006/");
         defaultPayments = new ArrayList<>();
         defaultPayments.add("Manual");
         defaultPayments.add("Magnetic");

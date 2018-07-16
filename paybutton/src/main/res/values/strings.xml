@@ -77,4 +77,6 @@
     <string name="enter_manual">Enter card data</string>
     <string name="no_payment_selected">No payment method selected.</string>
     <string name="read_qr">Read Qr code</string>
+    <string name="magnetic">Read card</string>
+    <string name="device_not_supprt_magnetic">Device not support magnetic card payment.</string>
 </resources>

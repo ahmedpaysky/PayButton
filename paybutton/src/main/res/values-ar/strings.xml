@@ -8,8 +8,6 @@
     <string name="amount">المبلغ</string>
     <string name="arabic">English</string>
     <string name="terms_conditions">الشروط والاحكام</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="card">بطاقة</string>
     <string name="wallet">المحفظة</string>
@@ -77,4 +75,6 @@
     <string name="enter_manual">ادخل بيانات الكارت</string>
     <string name="no_payment_selected">لم يتم اختيار طريقه الدفع.</string>
     <string name="read_qr">إقرأ كود الدفع</string>
+    <string name="magnetic">إقرأ البطاقة</string>
+    <string name="device_not_supprt_magnetic">الجهاز لا يدعم خاصيه قرأه البطاقة</string>
 </resources>

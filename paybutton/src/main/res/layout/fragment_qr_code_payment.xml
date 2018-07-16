@@ -33,7 +33,7 @@
                 android:drawablePadding="8dp"
                 android:drawableStart="@drawable/ic_card_black"
                 android:gravity="center_vertical"
-                android:text="@string/card"
+                android:text="@string/magnetic"
                 android:textColor="#2D3134" />
 
         </LinearLayout>

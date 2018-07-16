@@ -88,27 +88,50 @@ public class PayActivity extends BaseActivity
             infoDialog.setCancelable(false);
             infoDialog.showDialog();
             return;
-        } else {
-            // check default payment method.
-            defaultPayment = extras.getInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, -1);
-            if (defaultPayment == -1) {
-                // not select default payment , make one of them as default.
-                if (enableManual) {
-                    defaultPayment = AppConstant.PaymentMethods.MANUAL;
-                } else if (enableMagnetic) {
-                    defaultPayment = AppConstant.PaymentMethods.MAGNETIC;
-                } else {
-                    defaultPayment = AppConstant.PaymentMethods.QR_READER;
-                }
+        } else if (enableMagnetic) {
+            if (!AppUtils.isPaymentMachine(PayActivity.this)) {
+                enableMagnetic = false;
+                showDeviceNotSupportMagneticPaymentDialog();
+                return;
+            }
+        }
+        // check default payment method.
+        defaultPayment = extras.getInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, -1);
+        if (defaultPayment == -1) {
+            // not select default payment , make one of them as default.
+            if (enableManual) {
+                defaultPayment = AppConstant.PaymentMethods.MANUAL;
+            } else if (enableMagnetic) {
+                defaultPayment = AppConstant.PaymentMethods.MAGNETIC;
+            } else {
+                defaultPayment = AppConstant.PaymentMethods.QR_READER;
             }
         }
         if (defaultPayment == AppConstant.PaymentMethods.MANUAL) {
             showPayByManualCardFragment();
         } else if (defaultPayment == AppConstant.PaymentMethods.MAGNETIC) {
-            showMagneticReaderFragment();
+            if (AppUtils.isPaymentMachine(PayActivity.this)) {
+                showMagneticReaderFragment();
+            } else {
+                showDeviceNotSupportMagneticPaymentDialog();
+            }
         } else {
             showQrReaderFragment();
         }
+    }
+
+    private void showDeviceNotSupportMagneticPaymentDialog() {
+        InfoDialog infoDialog = new InfoDialog(this).setDialogText(R.string.device_not_supprt_magnetic)
+                .setDialogTitle(R.string.error)
+                .setButtonText(R.string.ok).setButtonClickListener(new DialogButtonClick() {
+                    @Override
+                    public void onButtonClick(Dialog dialog) {
+                        dialog.dismiss();
+                        finish();
+                    }
+                });
+        infoDialog.setCancelable(false);
+        infoDialog.showDialog();
     }
 
     private void showQrReaderFragment() {
