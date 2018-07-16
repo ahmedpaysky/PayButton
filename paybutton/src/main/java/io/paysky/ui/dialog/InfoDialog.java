@@ -68,16 +68,16 @@ public class InfoDialog extends Dialog implements View.OnClickListener {
     }
 
     public void showDialog() {
-        if (buttonClickListener != null) {
-            buttonClickListener.onButtonClick(this);
-        } else {
-            dismiss();
-        }
+        show();
     }
 
 
     @Override
     public void onClick(View view) {
-
+        if (buttonClickListener != null) {
+            buttonClickListener.onButtonClick(this);
+        } else {
+            dismiss();
+        }
     }
 }

@@ -48,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 boolean enableQrValue = SettingPrefs.getBooleanPrefs(MainActivity.this, "enable_qr", false);
                 String defaultPayment = SettingPrefs.getStringPrefs(MainActivity.this, "default_payment", "Manual");
                 String serverLink = SettingPrefs.getStringPrefs(MainActivity.this, "default_payment", ApiLinks.MAIN_LINK);
+                payButton.setServerLink(serverLink);
                 payButton.setEnableMagneticPayment(enableMagneticValue);
                 payButton.setEnableManualPayment(enableManualValue);
                 payButton.setEnableQrPayment(enableQrValue);

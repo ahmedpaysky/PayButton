@@ -89,16 +89,15 @@ public class MagneticCardReaderService {
                 TrackData trackData = new TrackData();
 
                 if (allLen > 0) {
-                    Log.d("track", "len > 0");
                     int len = stripInfo[1];
                     if (len != 0) {
                         trackData.track1 = new String(stripInfo, 2, len);
-                        Log.d("track", trackData.track1 + "");
                     }
                     int len2 = stripInfo[3 + len];
                     if (len2 != 0) {
                         trackData.track2 = new String(stripInfo, 4 + len, len2);
-                        Log.d("track", trackData.track2 + "");
+                    } else {
+                        continue;
                     }
 
                     String[] track2Spilt = trackData.track2.split("=");

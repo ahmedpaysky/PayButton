@@ -77,6 +77,7 @@ public class PayActivity extends BaseActivity
     private void showUserNeededPaymentMethod() {
         if (!enableManual && !enableMagnetic && !enableQr) {
             InfoDialog infoDialog = new InfoDialog(this).setDialogText(R.string.no_payment_selected)
+                    .setDialogTitle(R.string.error)
                     .setButtonText(R.string.ok).setButtonClickListener(new DialogButtonClick() {
                         @Override
                         public void onButtonClick(Dialog dialog) {
