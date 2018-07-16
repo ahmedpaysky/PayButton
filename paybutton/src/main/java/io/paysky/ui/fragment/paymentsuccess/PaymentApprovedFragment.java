@@ -203,6 +203,7 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
         if (i == R.id.close_button) {
             getActivity().finish();
         } else if (i == R.id.send_email_button) {
+            AppUtils.hideKeyboard(view);
             sendEmailButtonClick();
         } else if (i == R.id.print_receipt) {
             printReceiptButtonClick();

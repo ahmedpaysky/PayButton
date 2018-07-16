@@ -32,6 +32,7 @@ import io.paysky.ui.fragment.paymentsuccess.PaymentApprovedFragment;
 import io.paysky.ui.fragment.qr.QrCodePaymentFragment;
 import io.paysky.util.AppConstant;
 import io.paysky.util.AppUtils;
+import io.paysky.util.LocaleHelper;
 
 
 public class CardManualPaymentFragment extends BaseFragment implements View.OnClickListener {
@@ -173,6 +174,12 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
 
         readCardWithMagnetic = view.findViewById(R.id.swipe_layout);
         paymentsRaw = view.findViewById(R.id.payments_row);
+
+        if (LocaleHelper.getLocale(getActivity()).equals("ar")) {
+            cardNumberEditText.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+            expireDateEditText.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+            ccvEditText.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
+        }
     }
 
 

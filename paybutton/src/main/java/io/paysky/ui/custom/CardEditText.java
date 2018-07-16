@@ -60,7 +60,8 @@ public class CardEditText extends AppCompatEditText implements TextWatcher {
         if (s.startsWith("4") || s.matches(CardPattern.VISA)) {
             cardIcon = R.drawable.vi;
             type = "Visa";
-        } else if (s.matches(CardPattern.MASTERCARD_SHORTER) || s.matches(CardPattern.MASTERCARD_SHORT) || s.matches(CardPattern.MASTERCARD)) {
+        } else if (s.startsWith("5") || s.matches(CardPattern.MASTERCARD_SHORTER) || s.matches(CardPattern.MASTERCARD_SHORT)
+                || s.matches(CardPattern.MASTERCARD)) {
             cardIcon = R.drawable.mc;
             type = "MasterCard";
         } else if (s.matches(CardPattern.AMERICAN_EXPRESS)) {
@@ -80,7 +81,7 @@ public class CardEditText extends AppCompatEditText implements TextWatcher {
             type = "UNKNOWN";
         }
 
-        if (cardTypeImage!=null){
+        if (cardTypeImage != null) {
             cardTypeImage.setImageResource(cardIcon);
         }
 
