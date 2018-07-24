@@ -13,9 +13,9 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         card_view:cardBackgroundColor="@color/backgroundColorDark"
-        card_view:cardCornerRadius="6dp"
-        card_view:cardElevation="6dp"
-        card_view:cardPreventCornerOverlap="true"
+        card_view:cardCornerRadius="@dimen/_6sdp"
+        card_view:cardElevation="@dimen/_6sdp"
+        card_view:cardPreventCornerOverlap="false"
         card_view:cardUseCompatPadding="false">
 
         <RelativeLayout
