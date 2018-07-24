@@ -42,6 +42,8 @@ public class QrPaymentManager {
         request.setAmount(amount + "");
         request.setMerchantId(merchantId);
         request.setTerminalId(terminalId);
+        request.setTahweelQR(true);
+        request.setmVisaQR(true);
         request.setDateTimeLocalTrxn(request.getDateTimeLocalTrxn());
         request.setSecureHash(HashGenerator.createHashData(request));
         ApiConnection.generateQrCode(request, new ApiResponseListener<GenerateQrCodeResponse>() {

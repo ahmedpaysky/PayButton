@@ -1,6 +1,8 @@
 package io.paysky.data.model.request;
 
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
 
 import io.paysky.util.AppUtils;
@@ -51,6 +53,28 @@ public class QrGenratorRequest implements Serializable {
      * StoreLabel : Store Label
      */
 
+
+    @SerializedName("TahweelQR")
+    private boolean tahweelQR;
+
+    @SerializedName("mVisaQR")
+    private boolean mVisaQR;
+
+    public boolean isTahweelQR() {
+        return tahweelQR;
+    }
+
+    public void setTahweelQR(boolean tahweelQR) {
+        this.tahweelQR = tahweelQR;
+    }
+
+    public boolean ismVisaQR() {
+        return mVisaQR;
+    }
+
+    public void setmVisaQR(boolean mVisaQR) {
+        this.mVisaQR = mVisaQR;
+    }
 
     private String fees = "0";
     private String total = "0";
