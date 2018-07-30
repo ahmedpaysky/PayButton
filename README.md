@@ -30,7 +30,7 @@ allprojects { repositories {
 3- in your build.gradle file in app level in dependencies{} add :- implementation 'com.github.payskyCompany:fabsdk:1.1.10'
 Example:-
 dependencies {
-  implementation 'com.github.payskyCompany:paybutton:1.1.9'
+  implementation 'com.github.payskyCompany:paybutton:1.1.12'
 }
 4- Sync your project.
 
@@ -43,10 +43,11 @@ in order to use our SDK you should get merchant id and Terminal id from our comp
 
 1 – Attach to your design xml file our Button.
 
-<io.paysky.PayButton
-  android:id="@+id/paybtn"
-  android:layout_width="wrap_content"
-  android:layout_height="wrap_content" />
+  <io.paysky.ui.custom.PayButton
+                android:id="@+id/paybtn"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center" />
 
 2 - if you don't have a xml view layour file you can add our PayButton in your java code.
 
