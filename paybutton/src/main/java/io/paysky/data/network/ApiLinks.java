@@ -16,5 +16,7 @@ public class ApiLinks {
     public static final String TERMINAL_CONFIG = "Portal/TerminalConfigurationFile/S{terminalId}.xml";
     public static final String SMS_PAYMENT = "Cube/PayLink.svc/api/RequestToPay";
     public static final String MAGNETIC_PAYMENT = "Cube/mPOSHosting.svc/api/Execute";
+
+    public static final String GRAY_LINK = "https://grey.paysky.io/";
 }
 

@@ -4,11 +4,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.ColorRes;
+import android.support.annotation.DrawableRes;
 import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 import com.example.paybutton.R;
 
@@ -31,6 +34,15 @@ public class PayButton extends LinearLayout implements PaymentObserver {
     Double payAmount = 0.0;
     int currencyCode = 0;
     String notificationValue = null;
+    private boolean enableManualPayment, enableMagneticPayment, enableQrPayment;
+    private String serverLink;
+    private int defaultPayment;
+    //Objects.
+    PaymentTransactionCallback transactionCallback;
+    NotificationType notificationType;
+    //GUI.
+    private TextView payNow;
+
 
     public boolean isEnableManualPayment() {
         return enableManualPayment;
@@ -71,13 +83,6 @@ public class PayButton extends LinearLayout implements PaymentObserver {
     public void setServerLink(String serverLink) {
         this.serverLink = serverLink;
     }
-
-    private boolean enableManualPayment, enableMagneticPayment, enableQrPayment;
-    private String serverLink;
-    private int defaultPayment;
-    //Objects.
-    PaymentTransactionCallback transactionCallback;
-    NotificationType notificationType;
 
     public PayButton(Context context) {
         super(context);
@@ -142,18 +147,18 @@ public class PayButton extends LinearLayout implements PaymentObserver {
 
 
     void inflateView() {
-        View inflate = inflate(getContext(), R.layout.custom_pay_btn, null);
-        addView(inflate);
+        inflate(getContext(), R.layout.custom_pay_btn, this);
+        payNow = findViewById(R.id.pay_now);
         PaymentObservable.addObserver(this);
     }
 
 
     private void openPaymentActivity() {
         Bundle bundle = new Bundle();
-        bundle.putLong("terminal_id", terminalId);
-        bundle.putLong("merchant_id", merchantId);
-        bundle.putDouble("pay_amount", payAmount);
-        bundle.putString("receiver_mail", notificationValue);
+        bundle.putLong(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
+        bundle.putLong(AppConstant.BundleKeys.MERCHANT_ID, merchantId);
+        bundle.putDouble(AppConstant.BundleKeys.PAY_AMOUNT, payAmount);
+        bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, notificationValue);
         bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManualPayment);
         bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagneticPayment);
         bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQrPayment);
@@ -161,7 +166,6 @@ public class PayButton extends LinearLayout implements PaymentObserver {
         bundle.putString(AppConstant.BundleKeys.SERVER_LINK, serverLink);
         Intent intent = new Intent(getContext(), PayActivity.class);
         intent.putExtras(bundle);
-        //  intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
         getContext().startActivity(intent);
     }
 
@@ -200,4 +204,19 @@ public class PayButton extends LinearLayout implements PaymentObserver {
         PaymentObservable.removeObserver(this);
         super.finalize();
     }
+
+
+    public void setTextColor(@ColorRes int color) {
+        payNow.setTextColor(getContext().getResources().getColor(color));
+    }
+
+    public void setPayButtonBackground(@DrawableRes int background) {
+        setBackgroundResource(background);
+    }
+
+    public void setPayButtonBackgroundColor(@ColorRes int color) {
+        setBackgroundColor(getContext().getResources().getColor(color));
+    }
+
+
 }

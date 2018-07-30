@@ -76,5 +76,5 @@
     <string name="no_payment_selected">لم يتم اختيار طريقه الدفع.</string>
     <string name="read_qr">إقرأ كود الدفع</string>
     <string name="magnetic">إقرأ البطاقة</string>
-    <string name="device_not_supprt_magnetic">الجهاز لا يدعم خاصيه قرأه البطاقة</string>
+    <string name="device_not_support_magnetic">الجهاز لا يدعم خاصيه قرأه البطاقة</string>
 </resources>

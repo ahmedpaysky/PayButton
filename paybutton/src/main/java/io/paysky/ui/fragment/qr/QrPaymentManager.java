@@ -71,7 +71,7 @@ public class QrPaymentManager {
     }
 
 
-    void checkPaymentApproval(String merchantId, String terminalId, int transactionId) {
+    void checkPaymentApproval(String merchantId, String terminalId, int transactionId, final String paidAmount) {
         TransactionStatusRequest request = new TransactionStatusRequest();
         request.merchantId = merchantId;
         request.terminalId = terminalId;
@@ -90,7 +90,7 @@ public class QrPaymentManager {
                 if (response.success) {
                     // payment success.
                     if (response.isPaid) {
-                        paymentFragment.setPaymentApproved(response.externalTxnId);
+                        paymentFragment.setPaymentApproved(response.externalTxnId, paidAmount);
                     } else {
                         paymentFragment.listenToPaymentApproval();
                     }

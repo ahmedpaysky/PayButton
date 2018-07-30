@@ -14,7 +14,6 @@ import io.paysky.util.AppUtils;
 import io.paysky.util.HashGenerator;
 
 
-
 class PaymentApprovedManager {
     private PaymentApprovedFragment paymentApprovedFragment;
 
@@ -23,9 +22,8 @@ class PaymentApprovedManager {
     }
 
 
-    void sendEmail(final String email, String terminalId, String merchantId, String referenceNumber, String channelName, String transactionId,
-
-                   final int operationType) {
+    void sendEmail(final String email, String terminalId, String merchantId,
+                   String referenceNumber, String channelName, String transactionId, final int operationType) {
         // check internet.
         if (!paymentApprovedFragment.isInternetAvailable()) {
             paymentApprovedFragment.showNoInternetDialog();

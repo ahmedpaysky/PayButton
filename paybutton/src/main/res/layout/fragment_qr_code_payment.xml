@@ -14,32 +14,7 @@
         android:layout_marginTop="@dimen/_6sdp">
 
         <LinearLayout
-            android:id="@+id/magnetic_payment_layout"
-            android:layout_width="0dp"
-            android:layout_height="@dimen/_34sdp"
-            android:layout_marginEnd="4dp"
-            android:layout_weight="1"
-            android:background="@drawable/payment_option_unselected"
-            android:button="@null"
-            android:checked="true"
-            android:drawableStart="@drawable/ic_card"
-            android:gravity="center"
-            android:visibility="gone">
-
-            <TextView
-                android:id="@+id/qr_payment_textView"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawablePadding="8dp"
-                android:drawableStart="@drawable/ic_card_black"
-                android:gravity="center_vertical"
-                android:text="@string/magnetic"
-                android:textColor="#2D3134" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/card_manual_payment_layout"
+            android:id="@+id/manual_payment_layout"
             android:layout_width="0dp"
             android:layout_height="@dimen/_34sdp"
             android:layout_marginEnd="4dp"
@@ -99,10 +74,15 @@
 
     <ImageView
         android:id="@+id/qr_imageView"
-        android:layout_width="@dimen/_178sdp"
-        android:layout_height="@dimen/_167sdp"
+        android:layout_width="@dimen/_180sdp"
+        android:layout_height="@dimen/_170sdp"
         android:layout_gravity="center"
         android:scaleType="fitXY" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1" />
 
 
     <LinearLayout
@@ -153,7 +133,7 @@
             android:layout_weight="1"
             android:text="@string/cant_scan_code"
             android:textColor="#2d3134"
-            android:textSize="@dimen/_10sdp" />
+            android:textSize="@dimen/_11sdp" />
 
 
         <LinearLayout

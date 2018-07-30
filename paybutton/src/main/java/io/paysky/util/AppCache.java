@@ -23,7 +23,7 @@ public class AppCache {
     }
 
 
-    protected static interface CacheKeys {
+    protected interface CacheKeys {
         String MERCHANT_DATA = "merchant_data";
         String TERMINAL_CONFIG = "terminal_config";
     }

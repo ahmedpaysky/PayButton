@@ -21,14 +21,15 @@ import io.paysky.util.HashGenerator;
  */
 
 public class ManualPaymentManager {
-    private CardManualPaymentFragment paymentFragment;
+    private ManualPaymentFragment paymentFragment;
 
-    public ManualPaymentManager(CardManualPaymentFragment paymentFragment) {
+    public ManualPaymentManager(ManualPaymentFragment paymentFragment) {
         this.paymentFragment = paymentFragment;
     }
 
 
-    public void makePayment(String payAmount, final String merchantId, final String terminalId, String ccv, String expiryDate, String cardNumber, final String receiverMail) {
+    public void makePayment(String payAmount, final String merchantId, final String terminalId,
+                            String ccv, String expiryDate, final String cardHolder, final String cardNumber, final String receiverMail) {
         // check internet.
         if (!paymentFragment.isInternetAvailable()) {
             paymentFragment.showNoInternetDialog();
@@ -85,7 +86,8 @@ public class ManualPaymentManager {
                         // transaction success.
                         transaction.setSuccessTransactionId(response.transactionNo,
                                 response.actionCode + " " + response.message, response.approvalCode);
-                        paymentFragment.showTransactionApprovedFragment(response.transactionNo, response.approvalCode, response.retrievalRefNr , amount);
+                        paymentFragment.showTransactionApprovedFragment(response.transactionNo, response.approvalCode,
+                                response.retrievalRefNr, cardHolder, cardNumber, response.systemTraceNr);
                     }
                 }
             }

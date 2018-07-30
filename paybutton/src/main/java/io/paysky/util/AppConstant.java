@@ -3,7 +3,6 @@ package io.paysky.util;
 
 public interface AppConstant {
 
-
     interface BundleKeys {
         String TRANSACTION_CHANNEL = "transaction_channel";
         String TRANSACTION_ID = "transaction_id";
@@ -18,6 +17,10 @@ public interface AppConstant {
         String ENABLE_QR = "qr_reader";
         String DEFAULT_PAYMENT = "default_payment";
         String SERVER_LINK = "payment_link";
+        String CARD_HOLDER_NAME = "card_holder_name";
+        String CARD_NUMBER = "card_number";
+        String PAYMENT_DATA = "payment_data";
+        String RECEIPT = "receipt";
     }
 
 

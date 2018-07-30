@@ -8,16 +8,15 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="vertical"
-        tools:context="io.paysky.ui.fragment.manualpayment.CardManualPaymentFragment">
+        tools:context="io.paysky.ui.fragment.manualpayment.ManualPaymentFragment">
 
         <TableRow
-            android:id="@+id/payments_row"
             android:layout_marginEnd="12dp"
             android:layout_marginStart="12dp"
             android:layout_marginTop="@dimen/_6sdp">
 
             <LinearLayout
-                android:id="@+id/card_manual_payment_layout"
+                android:id="@+id/manual_payment_layout"
                 android:layout_width="0dp"
                 android:layout_height="@dimen/_34sdp"
                 android:layout_marginEnd="4dp"
@@ -187,7 +186,7 @@
             android:textColor="@android:color/white" />
 
         <LinearLayout
-            android:id="@+id/swipe_layout"
+            android:id="@+id/magnetic_payment"
             android:layout_height="42dp"
             android:layout_marginEnd="12dp"
             android:layout_marginStart="12dp"

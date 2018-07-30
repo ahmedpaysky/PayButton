@@ -1,7 +1,6 @@
 package io.paysky.ui.fragment.manualpayment;
 
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,11 +9,9 @@ import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
-import android.widget.TableRow;
 
 import com.example.paybutton.R;
 
@@ -24,40 +21,40 @@ import java.util.Locale;
 
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
+import io.paysky.data.model.ReceiptData;
+import io.paysky.data.model.PaymentData;
 import io.paysky.ui.base.ActivityHelper;
 import io.paysky.ui.base.BaseFragment;
 import io.paysky.ui.custom.CardEditText;
 import io.paysky.ui.fragment.magnetic.MagneticPaymentFragment;
 import io.paysky.ui.fragment.paymentsuccess.PaymentApprovedFragment;
 import io.paysky.ui.fragment.qr.QrCodePaymentFragment;
+import io.paysky.util.AppCache;
 import io.paysky.util.AppConstant;
 import io.paysky.util.AppUtils;
 import io.paysky.util.LocaleHelper;
 
 
-public class CardManualPaymentFragment extends BaseFragment implements View.OnClickListener {
+public class ManualPaymentFragment extends BaseFragment implements View.OnClickListener {
 
 
     //Objects,
     ActivityHelper activityHelper;
     private ManualPaymentManager paymentManager;
+    private PaymentData paymentData;
     //GUI.
     private CardEditText cardNumberEditText;
     private EditText cardOwnerNameEditText;
     private EditText expireDateEditText;
     private EditText ccvEditText;
     private ProgressDialog progressDialog;
-    private TableRow paymentsRaw;
-    private View walletPaymentLayout;
-    private View readCardWithMagnetic;
-    //Variables.
-    private String terminalId, merchantId;
-    private String payAmount, receiverMail;
-    private boolean enableQr, enableMagnetic, enableManual;
-    private int defaultPayment;
+    private View qrPayment;
+    private View magneticPayment;
+    private Button proceedButton;
+    private ImageView scanCardImageView;
 
 
-    public CardManualPaymentFragment() {
+    public ManualPaymentFragment() {
         // Required empty public constructor
     }
 
@@ -76,18 +73,13 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
 
     private void extractBundle() {
         Bundle arguments = getArguments();
-        terminalId = arguments.getString(AppConstant.BundleKeys.TERMINAL_ID);
-        merchantId = arguments.getString(AppConstant.BundleKeys.MERCHANT_ID);
-        payAmount = arguments.getString(AppConstant.BundleKeys.PAY_AMOUNT);
-        receiverMail = arguments.getString(AppConstant.BundleKeys.RECEIVER_MAIL);
-        enableMagnetic = arguments.getBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC);
-        enableManual = arguments.getBoolean(AppConstant.BundleKeys.ENABLE_MANUAL);
-        enableQr = arguments.getBoolean(AppConstant.BundleKeys.ENABLE_QR);
-        defaultPayment = arguments.getInt(AppConstant.BundleKeys.DEFAULT_PAYMENT);
+        if (arguments != null) {
+            paymentData = arguments.getParcelable(AppConstant.BundleKeys.PAYMENT_DATA);
+        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_card_manual_payment, container, false);
@@ -101,49 +93,45 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
     }
 
     private void showViewsBasedOnUserPrefs() {
-        if (enableQr) {
-            walletPaymentLayout.setOnClickListener(new View.OnClickListener() {
+        if (paymentData.enableQr) {
+            qrPayment.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Bundle bundle = new Bundle();
-                    bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId);
-                    bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
-                    bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount);
-                    bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
-                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQr);
-                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagnetic);
-                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManual);
-                    bundle.putInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, defaultPayment);
+                    bundle.putParcelable(AppConstant.BundleKeys.PAYMENT_DATA, paymentData);
                     activityHelper.replaceFragmentAndRemoveOldFragment(QrCodePaymentFragment.class, bundle);
                 }
             });
         } else {
-            paymentsRaw.setVisibility(View.GONE);
+            qrPayment.setVisibility(View.GONE);
         }
 
 
-        if (enableMagnetic) {
+        if (!paymentData.enableManual) {
+            // enable payment is disabled , prevent edit in editText.
+            cardNumberEditText.setEnabled(false);
+            cardOwnerNameEditText.setEnabled(false);
+            ccvEditText.setEnabled(false);
+            expireDateEditText.setEnabled(false);
+            scanCardImageView.setEnabled(false);
+            proceedButton.setEnabled(false);
+        }
+
+        if (paymentData.enableMagnetic) {
             if (AppUtils.isPaymentMachine(getContext())) {
-                readCardWithMagnetic.setVisibility(View.VISIBLE);
-                readCardWithMagnetic.setOnClickListener(new View.OnClickListener() {
+                magneticPayment.setVisibility(View.VISIBLE);
+                magneticPayment.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
                         // replace with magnetic fragment.
                         Bundle bundle = new Bundle();
-                        bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId);
-                        bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
-                        bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, payAmount);
-                        bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
-                        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQr);
-                        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagnetic);
-                        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManual);
-                        bundle.putInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, defaultPayment);
+                        bundle.putParcelable(AppConstant.BundleKeys.PAYMENT_DATA, paymentData);
                         activityHelper.replaceFragmentAndRemoveOldFragment(MagneticPaymentFragment.class, bundle);
                     }
                 });
             }
         } else {
-            readCardWithMagnetic.setVisibility(View.GONE);
+            magneticPayment.setVisibility(View.GONE);
         }
     }
 
@@ -161,20 +149,18 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
         cardOwnerNameEditText = view.findViewById(R.id.card_owner_name_editText);
         expireDateEditText = view.findViewById(R.id.expire_date_editText);
         ccvEditText = view.findViewById(R.id.ccv_editText);
-        Button proceedButton = view.findViewById(R.id.proceed_button);
+        proceedButton = view.findViewById(R.id.proceed_button);
         proceedButton.setOnClickListener(this);
-        walletPaymentLayout = view.findViewById(R.id.wallet_payment_layout);
-        ImageView scanCardWithCameraImageView = view.findViewById(R.id.scan_camera_imageView);
-        scanCardWithCameraImageView.setOnClickListener(new View.OnClickListener() {
+        qrPayment = view.findViewById(R.id.wallet_payment_layout);
+        scanCardImageView = view.findViewById(R.id.scan_camera_imageView);
+        scanCardImageView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 onScanCardCameraButtonClick();
             }
         });
 
-        readCardWithMagnetic = view.findViewById(R.id.swipe_layout);
-        paymentsRaw = view.findViewById(R.id.payments_row);
-
+        magneticPayment = view.findViewById(R.id.magnetic_payment);
         if (LocaleHelper.getLocale(getActivity()).equals("ar")) {
             cardNumberEditText.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
             expireDateEditText.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
@@ -196,14 +182,12 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
         String year = expireDate.substring(2);
         expireDate = year + month;
         hideKeyboard(view);
-        paymentManager.makePayment(payAmount, merchantId, terminalId, ccv, expireDate, cardNumber, receiverMail);
+        paymentManager.makePayment(paymentData.amount, paymentData.merchantId,
+                paymentData.terminalId, ccv, expireDate, cardOwnerName, cardNumber, paymentData.receiverMail);
     }
 
     private void hideKeyboard(View view) {
-        InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
-        if (imm != null) {
-            imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-        }
+        AppUtils.hideKeyboard(view);
     }
 
 
@@ -225,7 +209,6 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
             // validate that expire date large than today.
             int enteredMonth = Integer.parseInt(expireDate.substring(0, 2));
             int enteredYear = Integer.parseInt(expireDate.substring(2));
-
             SimpleDateFormat sdf = new SimpleDateFormat("MM/yy", Locale.US);
             String date = sdf.format(new Date());
             String month = date.substring(0, date.indexOf("/"));
@@ -297,16 +280,25 @@ public class CardManualPaymentFragment extends BaseFragment implements View.OnCl
 
     }
 
-    public void showTransactionApprovedFragment(String transactionNumber, String approvalCode, String retrievalRefNr, int amount) {
+    public void showTransactionApprovedFragment(String transactionNumber, String approvalCode,
+                                                String retrievalRefNr, String cardHolderName, String cardNumber, String systemTraceNumber) {
         Bundle bundle = new Bundle();
-        bundle.putString(AppConstant.BundleKeys.TRANSACTION_ID, transactionNumber);
-        bundle.putString(AppConstant.BundleKeys.AUTH_NUMBER, approvalCode);
-        bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
-        bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId);
-        bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
-        bundle.putString(AppConstant.BundleKeys.REFERENCE_NUMBER, retrievalRefNr);
-        bundle.putString(AppConstant.BundleKeys.TRANSACTION_CHANNEL, AppConstant.TransactionChannelName.CARD);
-        bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, amount + "");
+        ReceiptData transactionData = new ReceiptData();
+        transactionData.rrn = transactionNumber;
+        transactionData.authNumber = approvalCode;
+        transactionData.channelName = AppConstant.TransactionChannelName.CARD;
+        transactionData.refNumber = retrievalRefNr;
+        transactionData.receiptNumber = retrievalRefNr;
+        transactionData.amount = paymentData.amount;
+        transactionData.cardHolderName = cardHolderName;
+        transactionData.cardNumber = cardNumber;
+        transactionData.merchantName = AppCache.getMerchantData(getActivity()).merchantName;
+        transactionData.merchantId = paymentData.merchantId;
+        transactionData.terminalId = paymentData.terminalId;
+        transactionData.paymentDoneBy = ReceiptData.PaymentDoneBy.MANUAL.name();
+        transactionData.stan = systemTraceNumber;
+        transactionData.transactionType = ReceiptData.TransactionType.SALE.name();
+        bundle.putParcelable(AppConstant.BundleKeys.RECEIPT, transactionData);
         activityHelper.replaceFragmentAndAddOldToBackStack(PaymentApprovedFragment.class, bundle);
     }
 }

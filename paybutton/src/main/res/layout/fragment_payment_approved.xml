@@ -5,6 +5,8 @@
 
     <include
         layout="@layout/print_receipt_layout"
+        android:layout_width="384px"
+        android:layout_height="wrap_content"
         android:visibility="invisible" />
 
     <TableLayout
@@ -62,7 +64,7 @@
         </TableRow>
 
         <Button
-            android:id="@+id/print_receipt"
+            android:id="@+id/print_receipt_button"
             style="@style/buttonStyle"
             android:layout_width="0dp"
             android:layout_height="@dimen/_36sdp"

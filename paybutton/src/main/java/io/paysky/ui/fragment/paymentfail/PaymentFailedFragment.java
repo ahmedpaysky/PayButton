@@ -22,6 +22,7 @@ public class PaymentFailedFragment extends BaseFragment implements View.OnClickL
 
     //Objects,
     private ActivityHelper activityHelper;
+    private BaseActivity baseActivity;
     //GUI.
     private Button closeButton;
     private Button tryAgainButton;
@@ -37,11 +38,8 @@ public class PaymentFailedFragment extends BaseFragment implements View.OnClickL
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() instanceof ActivityHelper) {
-            activityHelper = (ActivityHelper) getActivity();
-        } else {
-            throw new IllegalStateException("activity must implement " + ActivityHelper.class.getSimpleName());
-        }
+        activityHelper = (ActivityHelper) getActivity();
+        baseActivity = (BaseActivity) getActivity();
         extractBundle();
     }
 
@@ -63,7 +61,7 @@ public class PaymentFailedFragment extends BaseFragment implements View.OnClickL
         activityHelper.setHeaderIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getActivity().finish();
+                baseActivity.finish();
             }
         });
         initView(view);
@@ -76,16 +74,16 @@ public class PaymentFailedFragment extends BaseFragment implements View.OnClickL
         tryAgainButton.setOnClickListener(this);
         transactionDeclinedTextView = view.findViewById(R.id.transaction_declined_textView);
         declineCauseTextView = view.findViewById(R.id.declined_cause_textView);
-        ((BaseActivity) getActivity()).showHtmlText(transactionDeclinedTextView, R.string.transaction_declined);
+        ((BaseActivity) baseActivity).showHtmlText(transactionDeclinedTextView, R.string.transaction_declined);
         declineCauseTextView.setText(declineCause);
     }
 
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.close_button) {
-            getActivity().onBackPressed();
+            baseActivity.onBackPressed();
         } else {
-            getActivity().onBackPressed();
+            baseActivity.onBackPressed();
         }
     }
 }

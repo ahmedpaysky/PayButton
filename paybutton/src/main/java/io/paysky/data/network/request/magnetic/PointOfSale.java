@@ -122,7 +122,7 @@ public class PointOfSale  implements Serializable {
         return this.CardAcceptorTerminalID;
     }
 
-    public void setCardAcceptorTerminalID(String CardAcceptorTerminalID) {
+    public void setTerminalId(String CardAcceptorTerminalID) {
         this.CardAcceptorTerminalID = CardAcceptorTerminalID;
     }
 
@@ -177,7 +177,7 @@ public class PointOfSale  implements Serializable {
         return this.CardAcceptorIDcode;
     }
 
-    public void setCardAcceptorIDcode(String CardAcceptorIDcode) {
+    public void setMerchantId(String CardAcceptorIDcode) {
         this.CardAcceptorIDcode = CardAcceptorIDcode;
     }
 

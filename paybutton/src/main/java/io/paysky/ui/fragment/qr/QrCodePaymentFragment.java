@@ -17,12 +17,14 @@ import android.widget.LinearLayout;
 
 import com.example.paybutton.R;
 
+import io.paysky.data.model.PaymentData;
+import io.paysky.data.model.ReceiptData;
 import io.paysky.ui.base.ActivityHelper;
 import io.paysky.ui.base.BaseFragment;
 import io.paysky.ui.base.PaymentTransaction;
-import io.paysky.ui.fragment.magnetic.MagneticPaymentFragment;
-import io.paysky.ui.fragment.manualpayment.CardManualPaymentFragment;
+import io.paysky.ui.fragment.manualpayment.ManualPaymentFragment;
 import io.paysky.ui.fragment.paymentsuccess.PaymentApprovedFragment;
+import io.paysky.util.AppCache;
 import io.paysky.util.AppConstant;
 import io.paysky.util.AppUtils;
 import io.paysky.util.ConvertQrCodToBitmapTask;
@@ -33,29 +35,27 @@ public class QrCodePaymentFragment extends BaseFragment implements View.OnClickL
 
 
     //Variables.
-    private String terminalId, testTerminalId = "88888887", merchantId, amount;
-    private boolean isGenerateQrCode, isPaymentDone;
-    private String qrCode;
-    private String receiverMail;
+    private String testTerminalId = "88888887";
+    private boolean qrGenerated, paymentDone;
+    private String generatedQrCode;
     private int transactionId;
-    private boolean enableQr, enableMagnetic, enableManual;
-    private int defaultPayment;
     //GUI.
     private ImageView qrImageView;
     private ProgressDialog progressDialog;
     private LinearLayout smsPaymentLayout;
     private EditText mobileNumberEditText;
+    private View manualPaymentLayout;
     private Button sendOtpButton;
     private LinearLayout requestPaymentLayout;
     private Button requestPaymentButton;
     private LinearLayout orLayout;
-    private LinearLayout magneticLayout;
     //Objects.
-    private Handler handler = new Handler();
+    private Handler checkTransactionHandler = new Handler();
     private Runnable checkPaymentRunnable;
     private ActivityHelper activityHelper;
     private QrPaymentManager paymentManager;
-    private View cardPaymentLayout;
+    private PaymentData paymentData;
+
 
     public QrCodePaymentFragment() {
         // Required empty public constructor
@@ -75,14 +75,9 @@ public class QrCodePaymentFragment extends BaseFragment implements View.OnClickL
 
     private void extractBundle() {
         Bundle arguments = getArguments();
-        terminalId = arguments.getString(AppConstant.BundleKeys.TERMINAL_ID);
-        merchantId = arguments.getString(AppConstant.BundleKeys.MERCHANT_ID);
-        amount = arguments.getString(AppConstant.BundleKeys.PAY_AMOUNT);
-        receiverMail = arguments.getString(AppConstant.BundleKeys.RECEIVER_MAIL, null);
-        enableMagnetic = arguments.getBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC);
-        enableManual = arguments.getBoolean(AppConstant.BundleKeys.ENABLE_MANUAL);
-        enableQr = arguments.getBoolean(AppConstant.BundleKeys.ENABLE_QR);
-        defaultPayment = arguments.getInt(AppConstant.BundleKeys.DEFAULT_PAYMENT);
+        if (arguments != null) {
+            paymentData = arguments.getParcelable(AppConstant.BundleKeys.PAYMENT_DATA);
+        }
     }
 
 
@@ -108,78 +103,53 @@ public class QrCodePaymentFragment extends BaseFragment implements View.OnClickL
         checkPaymentRunnable = new Runnable() {
             @Override
             public void run() {
-                paymentManager.checkPaymentApproval(merchantId, testTerminalId, transactionId);
+                paymentManager.checkPaymentApproval(paymentData.merchantId, testTerminalId, transactionId, paymentData.amount);
             }
         };
+
         // this is terminal id
-        //   terminalId = "88888887";
-        paymentManager.generateQrCode(amount, merchantId, testTerminalId);
+        paymentManager.generateQrCode(paymentData.amount, paymentData.merchantId, testTerminalId);
     }
 
     private void showViewsBasedOnUserPrefs() {
-        if (enableManual) {
-            cardPaymentLayout.setOnClickListener(new View.OnClickListener() {
+        if (paymentData.enableManual || paymentData.enableMagnetic) {
+            manualPaymentLayout.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
                     Bundle bundle = new Bundle();
-                    bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId);
-                    bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
-                    bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, amount);
-                    bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
-                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQr);
-                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagnetic);
-                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManual);
-                    bundle.putInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, defaultPayment);
-                    activityHelper.replaceFragmentAndRemoveOldFragment(CardManualPaymentFragment.class, bundle);
+                    bundle.putParcelable(AppConstant.BundleKeys.PAYMENT_DATA, paymentData);
+                    activityHelper.replaceFragmentAndRemoveOldFragment(ManualPaymentFragment.class, bundle);
                 }
             });
         } else {
-            cardPaymentLayout.setVisibility(View.GONE);
-        }
-        if (enableMagnetic) {
-            magneticLayout.setVisibility(View.VISIBLE);
-            magneticLayout.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Bundle bundle = new Bundle();
-                    bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId);
-                    bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
-                    bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, amount);
-                    bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
-                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQr);
-                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagnetic);
-                    bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManual);
-                    bundle.putInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, defaultPayment);
-                    activityHelper.replaceFragmentAndRemoveOldFragment(MagneticPaymentFragment.class, bundle);
-                }
-            });
+            manualPaymentLayout.setVisibility(View.GONE);
         }
     }
 
     @Override
     public void onStart() {
         super.onStart();
-        if (isGenerateQrCode && !isPaymentDone) {
-            handler.postDelayed(checkPaymentRunnable, 5000);
+        if (qrGenerated && !paymentDone) {
+            checkTransactionHandler.postDelayed(checkPaymentRunnable, 5000);
         }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        if (checkPaymentRunnable != null && isGenerateQrCode && !isPaymentDone) {
-            handler.removeCallbacks(checkPaymentRunnable);
+        if (checkPaymentRunnable != null && qrGenerated && !paymentDone) {
+            checkTransactionHandler.removeCallbacks(checkPaymentRunnable);
         }
     }
 
     private void showQrCode() {
-        new ConvertQrCodToBitmapTask(qrImageView).execute(qrCode);
+        new ConvertQrCodToBitmapTask(qrImageView).execute(generatedQrCode);
     }
 
 
     private void initView(View view) {
         // find views.
-        cardPaymentLayout = view.findViewById(R.id.card_manual_payment_layout);
+        manualPaymentLayout = view.findViewById(R.id.manual_payment_layout);
         smsPaymentLayout = view.findViewById(R.id.sms_payment_layout);
         smsPaymentLayout.setOnClickListener(this);
         mobileNumberEditText = view.findViewById(R.id.mobile_number_editText);
@@ -190,7 +160,6 @@ public class QrCodePaymentFragment extends BaseFragment implements View.OnClickL
         requestPaymentButton.setOnClickListener(this);
         qrImageView = view.findViewById(R.id.qr_imageView);
         orLayout = view.findViewById(R.id.or_layout);
-        magneticLayout = view.findViewById(R.id.magnetic_payment_layout);
     }
 
     void showProgressDialog() {
@@ -212,7 +181,7 @@ public class QrCodePaymentFragment extends BaseFragment implements View.OnClickL
         if (view.equals(sendOtpButton)) {
             sendOtpButtonClick();
         } else if (view.equals(requestPaymentButton)) {
-            hideQrImageVieww();
+            hideQrImageView();
             requestPaymentLayout.setVisibility(View.GONE);
             orLayout.setVisibility(View.GONE);
             showSmsPaymentLayout();
@@ -226,15 +195,11 @@ public class QrCodePaymentFragment extends BaseFragment implements View.OnClickL
             return;
         }
         // send to server.
-        paymentManager.requestToPay(qrCode, merchantId, testTerminalId, transactionId, mobileNumber);
+        paymentManager.requestToPay(generatedQrCode, paymentData.merchantId, testTerminalId, transactionId, mobileNumber);
     }
 
 
-    private void showQrImagView() {
-        qrImageView.setVisibility(View.VISIBLE);
-    }
-
-    private void hideQrImageVieww() {
+    private void hideQrImageView() {
         qrImageView.setVisibility(View.GONE);
     }
 
@@ -242,37 +207,33 @@ public class QrCodePaymentFragment extends BaseFragment implements View.OnClickL
         smsPaymentLayout.setVisibility(View.VISIBLE);
     }
 
-    private void hideSmsPaymentLayout() {
-        smsPaymentLayout.setVisibility(View.GONE);
-    }
-
-    public void setPaymentApproved(String externalTransactionId) {
-        isPaymentDone = true;
-        handler.removeCallbacks(checkPaymentRunnable);
+    public void setPaymentApproved(String externalTransactionId, String paidAmount) {
+        paymentDone = true;
+        checkTransactionHandler.removeCallbacks(checkPaymentRunnable);
         PaymentTransaction transaction = (PaymentTransaction) getActivity();
         transaction.setSuccessTransactionId(transactionId + "", "SUCCESS", "");
         Bundle bundle = new Bundle();
-        bundle.putString(AppConstant.BundleKeys.TRANSACTION_ID, transactionId + "");
-        bundle.putString(AppConstant.BundleKeys.AUTH_NUMBER, " ");
-        bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, receiverMail);
-        bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId);
-        bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, testTerminalId);
-        bundle.putString(AppConstant.BundleKeys.REFERENCE_NUMBER, externalTransactionId);
-        bundle.putString(AppConstant.BundleKeys.TRANSACTION_CHANNEL, AppConstant.TransactionChannelName.TAHWEEL);
-        bundle.putString(AppConstant.BundleKeys.PAY_AMOUNT, amount);
+        ReceiptData receiptData = new ReceiptData();
+        receiptData.terminalId = testTerminalId;
+        receiptData.merchantId = paymentData.merchantId;
+        receiptData.receiptNumber = externalTransactionId;
+        receiptData.amount = paidAmount;
+        receiptData.channelName = AppConstant.TransactionChannelName.TAHWEEL;
+        receiptData.merchantName = AppCache.getMerchantData(getActivity()).merchantName;
+        bundle.putParcelable(AppConstant.BundleKeys.RECEIPT, receiptData);
         activityHelper.replaceFragmentAndAddOldToBackStack(PaymentApprovedFragment.class, bundle);
     }
 
     public void listenToPaymentApproval() {
-        handler.postDelayed(checkPaymentRunnable, 5000);
+        checkTransactionHandler.postDelayed(checkPaymentRunnable, 5000);
     }
 
     public void setGenerateQrSuccess(String qrCode, int transactionId) {
-        isGenerateQrCode = true;
-        this.qrCode = qrCode;
+        qrGenerated = true;
+        this.generatedQrCode = qrCode;
         this.transactionId = transactionId;
         showQrCode();
-        handler.postDelayed(checkPaymentRunnable, 5000); // listen to payment approval.
+        checkTransactionHandler.postDelayed(checkPaymentRunnable, 5000); // listen to payment approval.
     }
 
     public void showToastMessage(@StringRes int text) {

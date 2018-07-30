@@ -8,15 +8,19 @@ import android.os.Parcelable;
  */
 
 public class TrackData implements Parcelable {
-    String data;
     String track1;
+    public String cardHolderName;
+    public String track2;
+    public String cardNumber;
+    public String expiryDate;
+
 
     protected TrackData(Parcel in) {
-        data = in.readString();
         track1 = in.readString();
         track2 = in.readString();
-        CardNumber = in.readString();
-        ExpiryData = in.readString();
+        cardNumber = in.readString();
+        expiryDate = in.readString();
+        cardHolderName = in.readString();
     }
 
     public static final Creator<TrackData> CREATOR = new Creator<TrackData>() {
@@ -36,23 +40,11 @@ public class TrackData implements Parcelable {
     }
 
 
-    public String track2;
-    public String CardNumber;
-    public String ExpiryData;
-
-
     TrackData() {
 
     }
 
 
-    public String getCardNumber() {
-        return CardNumber;
-    }
-
-    public String getExpiryData() {
-        return ExpiryData;
-    }
 
 
     @Override
@@ -62,10 +54,10 @@ public class TrackData implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel parcel, int i) {
-        parcel.writeString(data);
         parcel.writeString(track1);
         parcel.writeString(track2);
-        parcel.writeString(CardNumber);
-        parcel.writeString(ExpiryData);
+        parcel.writeString(cardNumber);
+        parcel.writeString(expiryDate);
+        parcel.writeString(cardHolderName);
     }
 }

@@ -43,9 +43,9 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                 }
 
                 // add config
-                boolean enableManualValue = SettingPrefs.getBooleanPrefs(MainActivity.this, "enable_manual", false);
-                boolean enableMagneticValue = SettingPrefs.getBooleanPrefs(MainActivity.this, "enable_magnetic", false);
-                boolean enableQrValue = SettingPrefs.getBooleanPrefs(MainActivity.this, "enable_qr", false);
+                boolean enableManualValue = SettingPrefs.getBooleanPrefs(MainActivity.this, "enable_manual", true);
+                boolean enableMagneticValue = SettingPrefs.getBooleanPrefs(MainActivity.this, "enable_magnetic", true);
+                boolean enableQrValue = SettingPrefs.getBooleanPrefs(MainActivity.this, "enable_qr", true);
                 String defaultPayment = SettingPrefs.getStringPrefs(MainActivity.this, "default_payment", "Manual");
                 String serverLink = SettingPrefs.getStringPrefs(MainActivity.this, "server_link", ApiLinks.MAIN_LINK);
                 payButton.setServerLink(serverLink);

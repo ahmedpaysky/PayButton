@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_width="@dimen/_65sdp"
+    android:layout_height="@dimen/_32sdp"
+    android:background="@drawable/button_blue_selector"
     android:orientation="vertical">
 
     <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:background="#00a7f6"
+        android:id="@+id/pay_now"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:gravity="center"
-        android:padding="8dp"
         android:text="@string/pay_now"
         android:textColor="#FFF" />
 </LinearLayout>

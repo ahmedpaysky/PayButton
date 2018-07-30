@@ -1,13 +1,12 @@
 package io.paysky.util;
 
-import android.content.Context;
 import android.device.MagManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 
-public class MagneticCardReaderService {
+public class MagneticCardReader {
 
     private final static int MESSAGE_CHECK_FAILE = 2;
     public final static int MESSAGE_READ_MAG = 3;
@@ -18,7 +17,7 @@ public class MagneticCardReaderService {
     private MagReaderThread magReaderThread;
     private static final int DEFAULT_TAG = 1;
 
-    public MagneticCardReaderService() {
+    public MagneticCardReader() {
         magManager = new MagManager();
     }
 
@@ -92,6 +91,10 @@ public class MagneticCardReaderService {
                     int len = stripInfo[1];
                     if (len != 0) {
                         trackData.track1 = new String(stripInfo, 2, len);
+                        String[] track1Data = trackData.track1.split("^");
+                        if (track1Data.length > 1) {
+                            trackData.cardHolderName = track1Data[1];
+                        }
                     }
                     int len2 = stripInfo[3 + len];
                     if (len2 != 0) {
@@ -99,10 +102,16 @@ public class MagneticCardReaderService {
                     } else {
                         continue;
                     }
+                    int len3 = stripInfo[5 + len + len2];
+
+                    if (len3 != 0 && len3 < 1024) {
+                        String track3 = new String(stripInfo, 6 + len + len2, len3);
+                        Log.d("track3", track3);
+                    }
 
                     String[] track2Spilt = trackData.track2.split("=");
-                    trackData.CardNumber = track2Spilt[0];
-                    trackData.ExpiryData = track2Spilt[1].substring(0, 4);
+                    trackData.cardNumber = track2Spilt[0];
+                    trackData.expiryDate = track2Spilt[1].substring(0, 4);
                     //    mHandler.removeMessages(MESSAGE_CHECK_FAILE);
                     Message msg = mHandler.obtainMessage(MESSAGE_READ_MAG);
                     Bundle bundle = new Bundle();
