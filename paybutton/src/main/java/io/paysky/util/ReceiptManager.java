@@ -3,9 +3,9 @@ package io.paysky.util;
 import android.content.Intent;
 import android.device.PrinterManager;
 import android.graphics.Bitmap;
+import android.os.Handler;
 import android.text.format.Time;
 import android.view.View;
-import android.view.ViewTreeObserver;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -66,16 +66,23 @@ public class ReceiptManager {
         sign = receiptView.findViewById(R.id.sign);
         receiptPrintTo = receiptView.findViewById(R.id.receipt_print_to);
         signLayout = receiptView.findViewById(R.id.sign_layout);
+     /*   AppUtils.applyFont("receipt_font.ttf", merchantNameTextView, receiptDate, receiptTime,
+                receiptMid, receiptTid, receiptNumber, transactionType, cardNumber,
+                 cardType, cardHolderName, stan, rrn, authNumber
+                , total, transactionPayType, receiptPrintTo
+        );*/
     }
 
 
     public void printMerchantReceipt() {
+        receiptPrintTo.setText(R.string.merchant_copy__);
         setReceiptData();
         printReceipt();
     }
 
 
     public void printCustomerReceipt() {
+        receiptPrintTo.setText(R.string.customer_copy__);
         setReceiptData();
         printReceipt();
     }
@@ -84,7 +91,7 @@ public class ReceiptManager {
         merchantNameTextView.setText(receiptData.merchantName);
         Time today = new Time(Time.getCurrentTimezone());
         today.setToNow();
-        receiptDate.setText(String.format("Date: %d-%d-%d", today.monthDay, today.month, today.year));
+        receiptDate.setText(String.format("Date: %d-%d-%d", today.monthDay, (today.month + 1), today.year));
         receiptTime.setText(String.format("Time: %d:%d:%d", today.hour, today.minute, today.second));
         receiptMid.setText("MID: " + receiptData.merchantId);
         receiptTid.setText("TID: " + receiptData.terminalId);
@@ -124,19 +131,22 @@ public class ReceiptManager {
 
     private void printReceipt() {
         // get layout image to print.
-        receiptView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+
+        new Handler().postDelayed(new Runnable() {
             @Override
-            public void onGlobalLayout() {
+            public void run() {
                 receiptView.setDrawingCacheEnabled(true);
-                receiptView.measure(View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+// Without it the view will have a dimension of 0,0 and the bitmap will be null
+                receiptView.measure(View.MeasureSpec.makeMeasureSpec(384, View.MeasureSpec.EXACTLY),
                         View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
                 receiptView.layout(0, 0, receiptView.getMeasuredWidth(), receiptView.getMeasuredHeight());
-                receiptView.buildDrawingCache(true);
-                Bitmap myBitmap = Bitmap.createBitmap(receiptView.getDrawingCache());
+                receiptView.buildDrawingCache();
+                final Bitmap myBitmap = Bitmap.createBitmap(receiptView.getDrawingCache());
                 receiptView.setDrawingCacheEnabled(false); // clear drawing cache
+
                 // print image.
                 PrinterManager printer = new PrinterManager();
-                printer.setupPage(384, -1);
+                printer.setupPage(-1, -1);
                 int ret = printer.drawBitmap(myBitmap, 0, 0);
                 int retprinter = printer.printPage(0);
                 if (retprinter != 0) {
@@ -149,9 +159,8 @@ public class ReceiptManager {
                     printReceiptListener.onPrintSuccess();
                 }
             }
-        });
+        }, 100);
     }
-
 
 }
 

@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.graphics.Typeface;
 import android.net.ConnectivityManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.support.annotation.StringRes;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.TextView;
 
 import org.greenrobot.eventbus.EventBus;
 import org.simpleframework.xml.Serializer;
@@ -185,6 +187,13 @@ public class AppUtils {
         InputMethodManager imm = (InputMethodManager) view.getContext().getSystemService(Activity.INPUT_METHOD_SERVICE);
         if (imm != null) {
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+        }
+    }
+
+    public static void applyFont(String font, TextView... views) {
+        Typeface typeface = Typeface.createFromAsset(views[0].getContext().getAssets(), font);
+        for (TextView textView : views) {
+            textView.setTypeface(typeface);
         }
     }
 }

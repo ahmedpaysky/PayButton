@@ -149,7 +149,6 @@ public class PayButton extends LinearLayout implements PaymentObserver {
     void inflateView() {
         inflate(getContext(), R.layout.custom_pay_btn, this);
         payNow = findViewById(R.id.pay_now);
-        PaymentObservable.addObserver(this);
     }
 
 
@@ -180,6 +179,7 @@ public class PayButton extends LinearLayout implements PaymentObserver {
             return;
         }
         openPaymentActivity();
+        PaymentObservable.addObserver(this);
     }
 
     @Override

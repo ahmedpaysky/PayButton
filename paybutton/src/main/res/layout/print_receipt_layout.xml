@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/receipt_layout"
-    android:layout_width="384px"
+    android:layout_width="400px"
     android:layout_height="wrap_content"
     android:background="@android:color/white"
     android:orientation="vertical"
@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Date: 2012-27"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/receipt_time"
@@ -40,7 +40,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="Time: 5:30PM"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
 
 
     </LinearLayout>
@@ -55,7 +55,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="MID: "
-            android:textSize="13sp" />
+            android:textSize="12sp" />
 
         <TextView
             android:id="@+id/receipt_tid"
@@ -63,7 +63,7 @@
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="TID: "
-            android:textSize="13sp" />
+            android:textSize="12sp" />
     </LinearLayout>
 
     <LinearLayout
@@ -72,11 +72,10 @@
 
         <TextView
             android:id="@+id/receipt_number"
-            android:layout_width="0dp"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
             android:text="Receipt #"
-            android:textSize="13sp" />
+            android:textSize="12sp" />
 
     </LinearLayout>
 
@@ -86,7 +85,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_weight="1"
         android:text="SALE"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -96,7 +94,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_weight="1"
         android:text="4000************2"
         android:textSize="16sp" />
 
@@ -104,7 +101,6 @@
         android:id="@+id/card_type"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="Visa"
         android:textSize="13sp" />
 
@@ -112,7 +108,6 @@
         android:id="@+id/card_holder_name"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="Ahmed Agamy"
         android:textSize="13sp" />
 
@@ -120,7 +115,6 @@
         android:id="@+id/stan"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="STAN: "
         android:textSize="13sp" />
 
@@ -128,7 +122,6 @@
         android:id="@+id/rrn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="RRN: "
         android:textSize="13sp" />
 
@@ -136,7 +129,6 @@
         android:id="@+id/auth_number"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="Auth No: "
         android:textSize="13sp" />
 
@@ -144,7 +136,6 @@
         android:id="@+id/total"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_weight="1"
         android:text="Total: "
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -153,8 +144,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="10dp"
-        android:layout_weight="1"
+        android:layout_marginTop="8dp"
         android:text="عمليه مقبوله"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -163,8 +153,6 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="4dp"
-        android:layout_weight="1"
         android:text="Approved"
         android:textSize="16sp"
         android:textStyle="bold" />
@@ -174,8 +162,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="8dp"
-        android:layout_weight="1"
+        android:layout_marginTop="4dp"
         android:text="Manual"
         android:textSize="13sp" />
 
@@ -191,8 +178,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginTop="8dp"
-            android:layout_weight="1"
+            android:layout_marginTop="4dp"
             android:text="Please sign below"
             android:textSize="13sp" />
 
@@ -201,7 +187,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
-            android:layout_weight="1"
             android:text="X"
             android:textSize="13sp" />
 
@@ -209,14 +194,21 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:background="#000" />
+
+
     </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="12dp"
+        android:background="#000" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="8dp"
-        android:layout_weight="1"
+        android:layout_marginTop="4dp"
         android:text="I agree to pay the above total amount according to card issuer agreement."
         android:textSize="13sp" />
 
@@ -226,8 +218,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="8dp"
-        android:layout_weight="1"
+        android:layout_marginTop="4dp"
         android:text="@string/customer_copy__"
         android:textSize="13sp" />
 
