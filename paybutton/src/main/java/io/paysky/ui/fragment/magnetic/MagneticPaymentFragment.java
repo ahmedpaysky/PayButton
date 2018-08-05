@@ -153,7 +153,7 @@ public class MagneticPaymentFragment extends BaseFragment {
         transactionData.merchantName = AppCache.getMerchantData(payActivity).merchantName;
         transactionData.merchantId = paymentData.merchantId;
         transactionData.terminalId = paymentData.terminalId;
-        transactionData.paymentDoneBy = ReceiptData.PaymentDoneBy.MAGNETIC.name();
+        transactionData.paymentDoneBy = ReceiptData.PaymentDoneBy.MAGNETIC.toString();
         transactionData.stan = systemTraceNumber;
         transactionData.transactionType = ReceiptData.TransactionType.SALE.name();
         bundle.putParcelable(AppConstant.BundleKeys.RECEIPT, transactionData);

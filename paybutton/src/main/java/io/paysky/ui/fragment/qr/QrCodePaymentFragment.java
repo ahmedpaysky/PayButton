@@ -35,7 +35,7 @@ public class QrCodePaymentFragment extends BaseFragment implements View.OnClickL
 
 
     //Variables.
-    private String testTerminalId = "88888887";
+    private String testTerminalId = "123456812";
     private boolean qrGenerated, paymentDone;
     private String generatedQrCode;
     private int transactionId;

@@ -97,34 +97,38 @@ public class ReceiptManager {
         receiptTid.setText("TID: " + receiptData.terminalId);
         receiptNumber.setText("Receipt #: " + receiptData.receiptNumber);
         transactionType.setText(receiptData.transactionType);
-        cardNumber.setText(receiptData.cardNumber);
         cardHolderName.setText(receiptData.cardHolderName);
+        String card = receiptData.cardNumber;
         if (receiptData.channelName.equals(AppConstant.TransactionChannelName.TAHWEEL)) {
             cardType.setText(AppConstant.TransactionChannelName.TAHWEEL);
+            this.cardNumber.setText(card);
             stan.setVisibility(View.GONE);
             rrn.setVisibility(View.GONE);
             authNumber.setVisibility(View.GONE);
             signLayout.setVisibility(View.GONE);
         } else {
-            if (receiptData.cardNumber.startsWith("4")) {
+            StringBuilder hiddenCard = new StringBuilder();
+            char[] chars = card.toCharArray();
+            for (int i = 0; i < chars.length; i++) {
+                if (i == 0 || i == 1 || i == 2 || i == 3 || i == 13 || i == 14 || i == 15) {
+                    hiddenCard.append(chars[i]);
+                } else {
+                    hiddenCard.append("X");
+                }
+            }
+            cardNumber.setText(hiddenCard.toString());
+            transactionPayType.setText(receiptData.paymentDoneBy);
+            if (card.startsWith("4")) {
                 cardType.setText("VISA");
             } else {
-                cardType.setText("MASTER");
+                cardType.setText("MasterCard");
             }
 
-            stan.setText("STAN: " + receiptData.stan);
-            rrn.setText("RRN: " + receiptData.rrn);
-            authNumber.setText("Auth No #: " + receiptData.authNumber);
-            transactionPayType.setText(receiptData.paymentDoneBy);
-            String transactionDoneBy = receiptData.paymentDoneBy;
-            if (transactionDoneBy.equals(ReceiptData.PaymentDoneBy.MANUAL) ||
-                    transactionDoneBy.equals(ReceiptData.PaymentDoneBy.MAGNETIC)) {
-                signLayout.setVisibility(View.VISIBLE);
-            } else {
-                signLayout.setVisibility(View.GONE);
-            }
         }
 
+        stan.setText("STAN: " + receiptData.stan);
+        rrn.setText("RRN: " + receiptData.rrn);
+        authNumber.setText("Auth No #: " + receiptData.authNumber);
         total.setText("TOTAL :      " + "EGP " + receiptData.amount);
 
     }
@@ -136,7 +140,6 @@ public class ReceiptManager {
             @Override
             public void run() {
                 receiptView.setDrawingCacheEnabled(true);
-// Without it the view will have a dimension of 0,0 and the bitmap will be null
                 receiptView.measure(View.MeasureSpec.makeMeasureSpec(384, View.MeasureSpec.EXACTLY),
                         View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
                 receiptView.layout(0, 0, receiptView.getMeasuredWidth(), receiptView.getMeasuredHeight());

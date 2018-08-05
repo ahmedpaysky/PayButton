@@ -39,7 +39,7 @@ public class PayActivity extends BaseActivity
         implements ActivityHelper, PaymentTransaction, View.OnClickListener {
 
 
-    private final boolean IS_DEBUG_APP = false;
+    private final boolean IS_DEBUG_APP = true;
 
     //GUI.
     private ImageView headerBackImage;

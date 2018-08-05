@@ -81,7 +81,7 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
             }
         });
         TextView appVersion = findViewById(R.id.app_version_textView);
-        appVersion.setText("PaySky PayButton Demo Version " + AppUtils.getVersionNumber(this));
+        appVersion.setText("PaySDK - PayButton module - Ver.  " + AppUtils.getVersionNumber(this));
         ImageView logoImageView = findViewById(R.id.logo_imageView);
         logoImageView.setOnLongClickListener(this);
     }

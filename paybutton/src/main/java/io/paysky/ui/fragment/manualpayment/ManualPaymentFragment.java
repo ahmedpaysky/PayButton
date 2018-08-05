@@ -295,7 +295,7 @@ public class ManualPaymentFragment extends BaseFragment implements View.OnClickL
         transactionData.merchantName = AppCache.getMerchantData(getActivity()).merchantName;
         transactionData.merchantId = paymentData.merchantId;
         transactionData.terminalId = paymentData.terminalId;
-        transactionData.paymentDoneBy = ReceiptData.PaymentDoneBy.MANUAL.name();
+        transactionData.paymentDoneBy = ReceiptData.PaymentDoneBy.MANUAL.toString();
         transactionData.stan = systemTraceNumber;
         transactionData.transactionType = ReceiptData.TransactionType.SALE.name();
         bundle.putParcelable(AppConstant.BundleKeys.RECEIPT, transactionData);

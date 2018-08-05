@@ -30,7 +30,7 @@
     <string name="trx_id">رقم المعاملة </string>
     <string name="close">اغلاق</string>
     <string name="send_receipt">ارسل نسخة</string>
-    <string name="send_notification">ارسال الاشعار</string>
+    <string name="send_notification">ارسال إيصال</string>
     <string name="email_hint">البريد الالكترونى</string>
     <string name="send">ارسال</string>
     <string name="transaction_success"><![CDATA[
@@ -77,4 +77,5 @@
     <string name="read_qr">إقرأ كود الدفع</string>
     <string name="magnetic">إقرأ البطاقة</string>
     <string name="device_not_support_magnetic">الجهاز لا يدعم خاصيه قرأه البطاقة</string>
+    <string name="powered_paysky">Powered by PaySky.io</string>
 </resources>

@@ -79,6 +79,9 @@
 
     </LinearLayout>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="8dp" />
 
     <TextView
         android:id="@+id/transaction_type"
@@ -220,6 +223,15 @@
         android:layout_gravity="center"
         android:layout_marginTop="4dp"
         android:text="@string/customer_copy__"
+        android:textSize="13sp" />
+
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="4dp"
+        android:text="@string/powered_paysky"
         android:textSize="13sp" />
 
 </LinearLayout>
