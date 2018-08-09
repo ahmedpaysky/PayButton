@@ -43,7 +43,7 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
     private TextView mailSentTextView;
     private Button printReceipt;
     //Variables.
-    private boolean printCustomerCopy = true;
+    private boolean printMerchantCopy = true;
 
     public PaymentApprovedFragment() {
         // Required empty public constructor
@@ -109,7 +109,7 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
         printReceipt = view.findViewById(R.id.print_receipt_button);
         if (AppUtils.isPaymentMachine(getContext())) {
             printReceipt.setVisibility(View.VISIBLE);
-            printReceipt.setText(R.string.customer_copy);
+            printReceipt.setText(R.string.merchant_copy);
             printReceipt.setOnClickListener(this);
         } else {
             printReceipt.setVisibility(View.GONE);
@@ -139,10 +139,10 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
     }
 
     public void printReceiptButtonClick() {
-        if (printCustomerCopy) {
-            receiptManager.printCustomerReceipt();
-        } else {
+        if (printMerchantCopy) {
             receiptManager.printMerchantReceipt();
+        } else {
+            receiptManager.printCustomerReceipt();
         }
     }
 
@@ -212,9 +212,9 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
 
     @Override
     public void onPrintSuccess() {
-        if (printCustomerCopy) {
-            printCustomerCopy = false;
-            printReceipt.setText(R.string.merchant_copy);
+        if (printMerchantCopy) {
+            printMerchantCopy = false;
+            printReceipt.setText(R.string.customer_copy);
         }
     }
 

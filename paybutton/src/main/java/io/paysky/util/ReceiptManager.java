@@ -101,6 +101,7 @@ public class ReceiptManager {
         String card = receiptData.cardNumber;
         if (receiptData.channelName.equals(AppConstant.TransactionChannelName.TAHWEEL)) {
             cardType.setText(AppConstant.TransactionChannelName.TAHWEEL);
+            transactionPayType.setText(R.string.qr);
             this.cardNumber.setText(card);
             stan.setVisibility(View.GONE);
             rrn.setVisibility(View.GONE);
@@ -110,7 +111,7 @@ public class ReceiptManager {
             StringBuilder hiddenCard = new StringBuilder();
             char[] chars = card.toCharArray();
             for (int i = 0; i < chars.length; i++) {
-                if (i == 0 || i == 1 || i == 2 || i == 3 || i == 13 || i == 14 || i == 15) {
+                if (i == 0 || i == 1 || i == 2 || i == 3 || i == 4 || i == 5 || i == 12 || i == 13 || i == 14 || i == 15) {
                     hiddenCard.append(chars[i]);
                 } else {
                     hiddenCard.append("X");
@@ -123,19 +124,15 @@ public class ReceiptManager {
             } else {
                 cardType.setText("MasterCard");
             }
-
         }
-
         stan.setText("STAN: " + receiptData.stan);
         rrn.setText("RRN: " + receiptData.rrn);
         authNumber.setText("Auth No #: " + receiptData.authNumber);
         total.setText("TOTAL :      " + "EGP " + receiptData.amount);
-
     }
 
     private void printReceipt() {
         // get layout image to print.
-
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {

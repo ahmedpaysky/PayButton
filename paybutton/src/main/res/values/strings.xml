@@ -84,4 +84,5 @@
     <string name="merchant_copy">Merchant copy</string>
     <string name="customer_copy">Customer copy</string>
     <string name="powered_paysky">Powered by PaySky.io</string>
+    <string name="qr">Qr Scan</string>
 </resources>

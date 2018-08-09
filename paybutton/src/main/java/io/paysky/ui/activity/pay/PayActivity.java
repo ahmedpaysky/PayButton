@@ -39,7 +39,7 @@ public class PayActivity extends BaseActivity
         implements ActivityHelper, PaymentTransaction, View.OnClickListener {
 
 
-    private final boolean IS_DEBUG_APP = true;
+    private final boolean IS_DEBUG_APP = false;
 
     //GUI.
     private ImageView headerBackImage;
@@ -210,7 +210,8 @@ public class PayActivity extends BaseActivity
             enableQr = extras.getBoolean(AppConstant.BundleKeys.ENABLE_QR, false);
             ApiLinks.MAIN_LINK = extras.getString(AppConstant.BundleKeys.SERVER_LINK, ApiLinks.MAIN_LINK);
         } else {
-            ApiLinks.MAIN_LINK = ApiLinks.GRAY_LINK;
+          //  ApiLinks.MAIN_LINK = ApiLinks.GRAY_LINK;
+            ApiLinks.MAIN_LINK = ApiLinks.MAIN_LINK;
         }
     }
 
