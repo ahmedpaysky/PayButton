@@ -1,7 +1,6 @@
 package io.paysky.ui.fragment.manualpayment;
 
 
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -21,37 +20,34 @@ import java.util.Locale;
 
 import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
-import io.paysky.data.model.ReceiptData;
 import io.paysky.data.model.PaymentData;
-import io.paysky.ui.base.ActivityHelper;
+import io.paysky.data.model.ReceiptData;
+import io.paysky.data.model.SuccessfulCardTransaction;
 import io.paysky.ui.base.BaseFragment;
 import io.paysky.ui.custom.CardEditText;
-import io.paysky.ui.fragment.magnetic.MagneticPaymentFragment;
+import io.paysky.ui.dialog.InfoDialog;
+import io.paysky.ui.fragment.paymentfail.PaymentFailedFragment;
 import io.paysky.ui.fragment.paymentsuccess.PaymentApprovedFragment;
-import io.paysky.ui.fragment.qr.QrCodePaymentFragment;
-import io.paysky.util.AppCache;
+import io.paysky.ui.fragment.webview.WebPaymentFragment;
 import io.paysky.util.AppConstant;
 import io.paysky.util.AppUtils;
-import io.paysky.util.LocaleHelper;
 
 
-public class ManualPaymentFragment extends BaseFragment implements View.OnClickListener {
+public class ManualPaymentFragment extends BaseFragment implements ManualPaymentView, View.OnClickListener {
 
 
-    //Objects,
-    ActivityHelper activityHelper;
-    private ManualPaymentManager paymentManager;
-    private PaymentData paymentData;
+    //Objects
+    private ManualPaymentPresenter presenter;
     //GUI.
     private CardEditText cardNumberEditText;
     private EditText cardOwnerNameEditText;
     private EditText expireDateEditText;
     private EditText ccvEditText;
-    private ProgressDialog progressDialog;
-    private View qrPayment;
-    private View magneticPayment;
     private Button proceedButton;
+    private String cardNumber;
+    private String expireDate;
     private ImageView scanCardImageView;
+    private String ccv;
 
 
     public ManualPaymentFragment() {
@@ -61,21 +57,9 @@ public class ManualPaymentFragment extends BaseFragment implements View.OnClickL
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getActivity() instanceof ActivityHelper) {
-            activityHelper = (ActivityHelper) getActivity();
-        } else {
-            throw new IllegalStateException("activity must implement " + ActivityHelper.class.getSimpleName());
-        }
         // get data from bundle.
-        extractBundle();
-        paymentManager = new ManualPaymentManager(this);
-    }
-
-    private void extractBundle() {
-        Bundle arguments = getArguments();
-        if (arguments != null) {
-            paymentData = arguments.getParcelable(AppConstant.BundleKeys.PAYMENT_DATA);
-        }
+        presenter = new ManualPaymentPresenter(getArguments());
+        presenter.attachView(this);
     }
 
     @Override
@@ -89,60 +73,17 @@ public class ManualPaymentFragment extends BaseFragment implements View.OnClickL
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initView(view);
-        showViewsBasedOnUserPrefs();
-    }
-
-    private void showViewsBasedOnUserPrefs() {
-        if (paymentData.enableQr) {
-            qrPayment.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View view) {
-                    Bundle bundle = new Bundle();
-                    bundle.putParcelable(AppConstant.BundleKeys.PAYMENT_DATA, paymentData);
-                    activityHelper.replaceFragmentAndRemoveOldFragment(QrCodePaymentFragment.class, bundle);
-                }
-            });
-        } else {
-            qrPayment.setVisibility(View.GONE);
-        }
-
-
-        if (!paymentData.enableManual) {
-            // enable payment is disabled , prevent edit in editText.
-            cardNumberEditText.setEnabled(false);
-            cardOwnerNameEditText.setEnabled(false);
-            ccvEditText.setEnabled(false);
-            expireDateEditText.setEnabled(false);
-            scanCardImageView.setEnabled(false);
-            proceedButton.setEnabled(false);
-        }
-
-        if (paymentData.enableMagnetic) {
-            if (AppUtils.isPaymentMachine(getContext())) {
-                magneticPayment.setVisibility(View.VISIBLE);
-                magneticPayment.setOnClickListener(new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        // replace with magnetic fragment.
-                        Bundle bundle = new Bundle();
-                        bundle.putParcelable(AppConstant.BundleKeys.PAYMENT_DATA, paymentData);
-                        activityHelper.replaceFragmentAndRemoveOldFragment(MagneticPaymentFragment.class, bundle);
-                    }
-                });
-            }
-        } else {
-            magneticPayment.setVisibility(View.GONE);
-        }
     }
 
     private void initView(View view) {
-        activityHelper.setHeaderIcon(R.drawable.ic_back);
-        activityHelper.setHeaderIconClickListener(new View.OnClickListener() {
+        activity.setHeaderIcon(R.drawable.ic_back);
+        activity.setHeaderIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getActivity().finish();
+                activity.finish();
             }
         });
+
         ImageView cardTypeImageView = view.findViewById(R.id.card_type_imageView);
         cardNumberEditText = view.findViewById(R.id.card_number_editText);
         cardNumberEditText.setCardTypeImage(cardTypeImageView);
@@ -151,43 +92,50 @@ public class ManualPaymentFragment extends BaseFragment implements View.OnClickL
         ccvEditText = view.findViewById(R.id.ccv_editText);
         proceedButton = view.findViewById(R.id.proceed_button);
         proceedButton.setOnClickListener(this);
-        qrPayment = view.findViewById(R.id.wallet_payment_layout);
-        scanCardImageView = view.findViewById(R.id.scan_camera_imageView);
-        scanCardImageView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                onScanCardCameraButtonClick();
-            }
-        });
-
-        magneticPayment = view.findViewById(R.id.magnetic_payment);
-        if (LocaleHelper.getLocale(getActivity()).equals("ar")) {
+        if (isAppLanguageAr()) {
             cardNumberEditText.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
             expireDateEditText.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
             ccvEditText.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
         }
+        scanCardImageView = view.findViewById(R.id.scan_camera_imageView);
+        scanCardImageView.setOnClickListener(this);
     }
 
 
     @Override
     public void onClick(View view) {
-        // validate user inputs.
-        String cardNumber = getText(cardNumberEditText).replaceAll(" ", "");
+        if (view.equals(proceedButton)) {
+            makePaymentClick();
+        } else if (view.equals(scanCardImageView)) {
+            onScanCardCameraButtonClick();
+        }
+    }
+
+    private void makePaymentClick() {
+        // get manual payment data.
+        cardNumber = getText(cardNumberEditText).replaceAll(" ", "");
         String cardOwnerName = getText(cardOwnerNameEditText);
-        String expireDate = getText(expireDateEditText).replaceAll("/", "");
-        String ccv = getText(ccvEditText);
+        expireDate = getText(expireDateEditText).replaceAll("/", "");
+        ccv = getText(ccvEditText);
         if (!isInputsValid(cardNumber, cardOwnerName, expireDate, ccv)) return;
         // replace expire date.
         String month = expireDate.substring(0, 2);
         String year = expireDate.substring(2);
         expireDate = year + month;
-        hideKeyboard(view);
-        paymentManager.makePayment(paymentData.amount, paymentData.merchantId,
-                paymentData.terminalId, ccv, expireDate, cardOwnerName, cardNumber, paymentData.receiverMail);
+
+        AppUtils.hideKeyboard(proceedButton);
+
+        presenter.makePayment(cardNumber, expireDate, cardOwnerName, ccv);
     }
 
-    private void hideKeyboard(View view) {
-        AppUtils.hideKeyboard(view);
+
+    private void onScanCardCameraButtonClick() {
+        Intent scanIntent = new Intent(getActivity(), CardIOActivity.class);
+        scanIntent.putExtra(CardIOActivity.EXTRA_USE_PAYPAL_ACTIONBAR_ICON, false);
+        scanIntent.putExtra(CardIOActivity.EXTRA_HIDE_CARDIO_LOGO, false);
+        scanIntent.putExtra(CardIOActivity.EXTRA_SUPPRESS_MANUAL_ENTRY, true);
+        // MY_SCAN_REQUEST_CODE is arbitrary and is only used within this activity.
+        startActivityForResult(scanIntent, 1005);
     }
 
 
@@ -235,33 +183,12 @@ public class ManualPaymentFragment extends BaseFragment implements View.OnClickL
         return isValidInputs;
     }
 
-    void showProgress() {
-        if (progressDialog == null) {
-            progressDialog = AppUtils.createProgressDialog(getActivity(), R.string.please_wait);
-        }
-        progressDialog.show();
-    }
-
-    void hideProgress() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
-    }
-
-    private void onScanCardCameraButtonClick() {
-        Intent scanIntent = new Intent(getActivity(), CardIOActivity.class);
-        scanIntent.putExtra(CardIOActivity.EXTRA_USE_PAYPAL_ACTIONBAR_ICON, false);
-        scanIntent.putExtra(CardIOActivity.EXTRA_HIDE_CARDIO_LOGO, false);
-        scanIntent.putExtra(CardIOActivity.EXTRA_SUPPRESS_MANUAL_ENTRY, true);
-        // MY_SCAN_REQUEST_CODE is arbitrary and is only used within this activity.
-        startActivityForResult(scanIntent, 1005);
-    }
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-
         if (requestCode == 1005) {
+            // get result of read card data.
             if (data != null && data.hasExtra(CardIOActivity.EXTRA_SCAN_RESULT)) {
                 CreditCard creditCard = data.getParcelableExtra(CardIOActivity.EXTRA_SCAN_RESULT);
                 // success.
@@ -275,30 +202,67 @@ public class ManualPaymentFragment extends BaseFragment implements View.OnClickL
                 }
                 cardNumberEditText.setText(numberBuilder.toString());
             }
-            // else handle other activity results
         }
-
     }
 
+    @Override
     public void showTransactionApprovedFragment(String transactionNumber, String approvalCode,
-                                                String retrievalRefNr, String cardHolderName, String cardNumber, String systemTraceNumber) {
+                                                String retrievalRefNr, String cardHolderName, String cardNumber, String systemTraceNumber, PaymentData paymentData
+    ) {
         Bundle bundle = new Bundle();
-        ReceiptData transactionData = new ReceiptData();
-        transactionData.rrn = transactionNumber;
-        transactionData.authNumber = approvalCode;
-        transactionData.channelName = AppConstant.TransactionChannelName.CARD;
-        transactionData.refNumber = retrievalRefNr;
-        transactionData.receiptNumber = retrievalRefNr;
-        transactionData.amount = paymentData.amount;
-        transactionData.cardHolderName = cardHolderName;
-        transactionData.cardNumber = cardNumber;
-        transactionData.merchantName = AppCache.getMerchantData(getActivity()).merchantName;
-        transactionData.merchantId = paymentData.merchantId;
-        transactionData.terminalId = paymentData.terminalId;
-        transactionData.paymentDoneBy = ReceiptData.PaymentDoneBy.MANUAL.toString();
-        transactionData.stan = systemTraceNumber;
-        transactionData.transactionType = ReceiptData.TransactionType.SALE.name();
-        bundle.putParcelable(AppConstant.BundleKeys.RECEIPT, transactionData);
-        activityHelper.replaceFragmentAndAddOldToBackStack(PaymentApprovedFragment.class, bundle);
+        ReceiptData receiptData = new ReceiptData();
+        receiptData.rrn = transactionNumber;
+        receiptData.authNumber = approvalCode;
+        receiptData.channelName = AppConstant.TransactionChannelName.CARD;
+        receiptData.refNumber = retrievalRefNr;
+        receiptData.receiptNumber = retrievalRefNr;
+        receiptData.amount = paymentData.amountFormatted;
+        receiptData.cardHolderName = cardHolderName;
+        receiptData.cardNumber = cardNumber;
+        receiptData.merchantName = paymentData.merchantName;
+        receiptData.merchantId = paymentData.merchantId;
+        receiptData.terminalId = paymentData.terminalId;
+        receiptData.paymentType = ReceiptData.PaymentDoneBy.MANUAL.toString();
+        receiptData.stan = systemTraceNumber;
+        receiptData.transactionType = ReceiptData.TransactionType.SALE.name();
+        receiptData.secureHashKey = paymentData.secureHashKey;
+        bundle.putParcelable(AppConstant.BundleKeys.RECEIPT, receiptData);
+        activity.replaceFragmentAndRemoveOldFragment(PaymentApprovedFragment.class, bundle);
+    }
+
+
+    @Override
+    public void showErrorInServerDialog() {
+        InfoDialog infoDialog = new InfoDialog(activity);
+        infoDialog.setTitle(R.string.error);
+        infoDialog.setDialogText(R.string.error_try_again);
+        infoDialog.showAgreeButton(R.string.ok, null).showDialog();
+    }
+
+    @Override
+    public void setFailTransactionError(Throwable exception) {
+        activity.setFailTransactionError(exception);
+    }
+
+    @Override
+    public void showPaymentFailedFragment(Bundle bundle) {
+        activity.replaceFragmentAndAddOldToBackStack(PaymentFailedFragment.class, bundle);
+    }
+
+    @Override
+    public void successCardTransaction(SuccessfulCardTransaction cardTransaction) {
+        activity.successCardTransaction(cardTransaction);
+    }
+
+    public void show3dpWebView(String webBody, String url, int gatewayType, PaymentData paymentData) {
+        Bundle bundle = new Bundle();
+        bundle.putString("request_body", webBody);
+        bundle.putString("url", url);
+        bundle.putInt("gateway_type", gatewayType);
+        bundle.putString("card_number", cardNumber);
+        bundle.putString("expiry_date", expireDate);
+        bundle.putString("cvv", ccv);
+        bundle.putParcelable(AppConstant.BundleKeys.PAYMENT_DATA, paymentData);
+        activity.replaceFragmentAndRemoveOldFragment(WebPaymentFragment.class, bundle);
     }
 }

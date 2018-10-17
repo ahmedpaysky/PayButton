@@ -19,9 +19,6 @@ public class SendReceiptByMailRequest{
 	@SerializedName("DateTimeLocalTrxn")
 	public String dateTimeLocalTrxn;
 
-	@SerializedName("ClientId")
-	public long clientId;
-
 	@SerializedName("ExternalReceiptNo")
 	public String externalReceiptNo;
 

@@ -13,8 +13,9 @@ public class ReceiptData implements Parcelable {
     public String cardHolderName = "TEST";
     public String stan, rrn, authNumber;
     public String amount;
-    public String paymentDoneBy;
+    public String paymentType;
     public String refNumber, channelName;
+    public String secureHashKey;
 
 
     public ReceiptData() {
@@ -33,9 +34,10 @@ public class ReceiptData implements Parcelable {
         rrn = in.readString();
         authNumber = in.readString();
         amount = in.readString();
-        paymentDoneBy = in.readString();
+        paymentType = in.readString();
         refNumber = in.readString();
         channelName = in.readString();
+        secureHashKey = in.readString();
     }
 
     public static final Creator<ReceiptData> CREATOR = new Creator<ReceiptData>() {
@@ -69,14 +71,10 @@ public class ReceiptData implements Parcelable {
         parcel.writeString(rrn);
         parcel.writeString(authNumber);
         parcel.writeString(amount);
-        parcel.writeString(paymentDoneBy);
+        parcel.writeString(paymentType);
         parcel.writeString(refNumber);
         parcel.writeString(channelName);
-    }
-
-
-    public enum CardType {
-        VISA, MASTER;
+        parcel.writeString(secureHashKey);
     }
 
     public enum TransactionType {

@@ -22,8 +22,9 @@ public class InfoDialog extends Dialog implements View.OnClickListener {
     //GUI.
     private TextView dialogTitleTextView;
     private TextView dialogContentTextView;
-    private Button dialogButton;
-    private DialogButtonClick buttonClickListener;
+    private Button agreeButton, cancelButton;
+    private DialogAgreeButtonClick agreeButtonClick;
+    private DialogCancelButtonClick cancelButtonClick;
 
     public InfoDialog(@NonNull Context context) {
         super(context);
@@ -35,8 +36,10 @@ public class InfoDialog extends Dialog implements View.OnClickListener {
         View dialogView = ViewUtil.inflateView(getContext(), R.layout.dialog_info);
         dialogTitleTextView = dialogView.findViewById(R.id.dialog_title_textView);
         dialogContentTextView = dialogView.findViewById(R.id.dialog_content_textView);
-        dialogButton = dialogView.findViewById(R.id.dialog_button);
-        dialogButton.setOnClickListener(this);
+        agreeButton = dialogView.findViewById(R.id.agree_button);
+        cancelButton = dialogView.findViewById(R.id.cancel_action);
+        agreeButton.setOnClickListener(this);
+        cancelButton.setOnClickListener(this);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(dialogView);
     }
@@ -57,13 +60,8 @@ public class InfoDialog extends Dialog implements View.OnClickListener {
         return this;
     }
 
-    public InfoDialog setButtonText(@StringRes int buttonText) {
-        dialogButton.setText(buttonText);
-        return this;
-    }
-
-    public InfoDialog setButtonClickListener(DialogButtonClick buttonClickListener) {
-        this.buttonClickListener = buttonClickListener;
+    public InfoDialog setCancel(boolean isCancel) {
+        setCancelable(isCancel);
         return this;
     }
 
@@ -72,12 +70,50 @@ public class InfoDialog extends Dialog implements View.OnClickListener {
     }
 
 
+    public InfoDialog showAgreeButton(@StringRes int buttonText, DialogAgreeButtonClick agreeButtonClick) {
+        agreeButton.setText(buttonText);
+        agreeButton.setVisibility(View.VISIBLE);
+        this.agreeButtonClick = agreeButtonClick;
+        return this;
+    }
+
+
+    public InfoDialog showAgreeButton(DialogAgreeButtonClick agreeButtonClick) {
+        agreeButton.setText(R.string.ok);
+        agreeButton.setVisibility(View.VISIBLE);
+        this.agreeButtonClick = agreeButtonClick;
+        return this;
+    }
+
+    public InfoDialog showCancelButton(@StringRes int buttonText, DialogCancelButtonClick cancelButtonClick) {
+        cancelButton.setText(buttonText);
+        cancelButton.setVisibility(View.VISIBLE);
+        this.cancelButtonClick = cancelButtonClick;
+        return this;
+    }
+
+    public InfoDialog showCancelButton(DialogCancelButtonClick cancelButtonClick) {
+        cancelButton.setText(R.string.cancel);
+        cancelButton.setVisibility(View.VISIBLE);
+        this.cancelButtonClick = cancelButtonClick;
+        return this;
+    }
+
+
     @Override
     public void onClick(View view) {
-        if (buttonClickListener != null) {
-            buttonClickListener.onButtonClick(this);
-        } else {
-            dismiss();
+        if (view.equals(agreeButton)) {
+            if (agreeButtonClick != null) {
+                agreeButtonClick.onAgreeDialogButtonClick(this);
+            } else {
+                dismiss();
+            }
+        } else if (view.equals(cancelButton)) {
+            if (cancelButtonClick != null) {
+                cancelButtonClick.onCancelDialogButtonClick(this);
+            } else {
+                dismiss();
+            }
         }
     }
 }

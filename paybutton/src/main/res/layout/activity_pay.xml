@@ -31,7 +31,7 @@
                 android:padding="8dp">
 
                 <ImageView
-                    android:id="@+id/header_back_imageVieww"
+                    android:id="@+id/header_back_imageView"
                     android:layout_width="@dimen/_32sdp"
                     android:layout_height="@dimen/_32sdp"
                     android:layout_gravity="center"
@@ -44,9 +44,9 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:gravity="center_vertical"
-                    android:textSize="@dimen/_16ssp"
                     android:text="@string/quick_payment_form"
-                    android:textColor="@android:color/white" />
+                    android:textColor="@android:color/white"
+                    android:textSize="@dimen/_16ssp" />
 
             </LinearLayout>
 
@@ -66,7 +66,7 @@
                     android:layout_width="0dp"
                     android:layout_height="match_parent"
                     android:layout_marginEnd="@dimen/_4sdp"
-                    android:layout_weight="2"
+                    android:layout_weight="1"
                     android:orientation="vertical">
 
                     <TextView
@@ -136,6 +136,7 @@
                             tools:text="200" />
 
                         <TextView
+                            android:id="@+id/currency_textView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginStart="@dimen/_2sdp"
@@ -169,6 +170,65 @@
                 android:layout_height="match_parent"
                 android:layout_below="@id/divider1"
                 android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="12dp"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginTop="@dimen/_6sdp"
+                    android:baselineAligned="false">
+
+                    <LinearLayout
+                        android:id="@+id/card_payment_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/_34sdp"
+                        android:layout_marginEnd="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/payment_option_selected"
+                        android:button="@null"
+                        android:checked="true"
+                        android:visibility="gone"
+                        android:drawableStart="@drawable/ic_card_white"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/card_payment_textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="8dp"
+                            android:drawableStart="@drawable/ic_card_white"
+                            android:gravity="center_vertical"
+                            android:text="@string/card"
+                            android:textColor="@android:color/white" />
+
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/qr_payment_layout"
+                        android:layout_width="0dp"
+                        android:layout_height="@dimen/_34sdp"
+                        android:layout_marginStart="4dp"
+                        android:layout_weight="1"
+                        android:background="@drawable/payment_option_unselected"
+                        android:button="@null"
+                        android:checked="true"
+                        android:visibility="gone"
+                        android:drawableStart="@drawable/ic_card_white"
+                        android:gravity="center">
+
+                        <TextView
+                            android:id="@+id/qr_payment_textView"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:drawablePadding="8dp"
+                            android:drawableStart="@drawable/ic_wallet_gray"
+                            android:gravity="center_vertical"
+                            android:text="@string/wallet"
+                            android:textColor="#2D3134" />
+
+                    </LinearLayout>
+                </LinearLayout>
 
                 <FrameLayout
                     android:id="@+id/fragment_frame"

@@ -10,60 +10,6 @@
         android:orientation="vertical"
         tools:context="io.paysky.ui.fragment.manualpayment.ManualPaymentFragment">
 
-        <TableRow
-            android:layout_marginEnd="12dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="@dimen/_6sdp">
-
-            <LinearLayout
-                android:id="@+id/manual_payment_layout"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/_34sdp"
-                android:layout_marginEnd="4dp"
-                android:layout_weight="1"
-                android:background="@drawable/payment_option_selected"
-                android:button="@null"
-                android:checked="true"
-                android:drawableStart="@drawable/ic_card"
-                android:gravity="center">
-
-                <TextView
-                    android:id="@+id/card_payment_textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="8dp"
-                    android:drawableStart="@drawable/ic_card"
-                    android:gravity="center_vertical"
-                    android:text="@string/card"
-                    android:textColor="@android:color/white" />
-
-            </LinearLayout>
-
-            <LinearLayout
-                android:id="@+id/wallet_payment_layout"
-                android:layout_width="0dp"
-                android:layout_height="@dimen/_34sdp"
-                android:layout_marginStart="4dp"
-                android:layout_weight="1"
-                android:background="@drawable/payment_option_unselected"
-                android:button="@null"
-                android:checked="true"
-                android:drawableStart="@drawable/ic_card"
-                android:gravity="center">
-
-                <TextView
-                    android:id="@+id/wallet_payment_textView"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:drawablePadding="8dp"
-                    android:drawableStart="@drawable/ic_wallet_gray"
-                    android:gravity="center_vertical"
-                    android:text="@string/wallet"
-                    android:textColor="#2D3134" />
-
-            </LinearLayout>
-        </TableRow>
-
         <TextView
             android:layout_marginBottom="@dimen/_7sdp"
             android:layout_marginTop="@dimen/_7sdp"
@@ -105,6 +51,7 @@
                 android:paddingEnd="8dp"
                 android:paddingStart="8dp"
                 android:singleLine="true"
+                android:text="5123456789012346"
                 android:textColorHint="?android:textColorHint"
                 android:textDirection="ltr" />
 
@@ -185,23 +132,6 @@
             android:text="@string/proceed"
             android:textColor="@android:color/white" />
 
-        <LinearLayout
-            android:id="@+id/magnetic_payment"
-            android:layout_height="42dp"
-            android:layout_marginEnd="12dp"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="8dp"
-            android:background="@drawable/button_gray1"
-            android:gravity="center"
-            android:visibility="gone">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:drawablePadding="8dp"
-                android:drawableStart="@drawable/ic_swipe"
-                android:text="@string/swipe" />
-        </LinearLayout>
     </TableLayout>
 
 </LinearLayout>

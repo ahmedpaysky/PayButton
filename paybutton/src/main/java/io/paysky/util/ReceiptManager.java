@@ -118,7 +118,7 @@ public class ReceiptManager {
                 }
             }
             cardNumber.setText(hiddenCard.toString());
-            transactionPayType.setText(receiptData.paymentDoneBy);
+            transactionPayType.setText(receiptData.paymentType);
             if (card.startsWith("4")) {
                 cardType.setText("VISA");
             } else {

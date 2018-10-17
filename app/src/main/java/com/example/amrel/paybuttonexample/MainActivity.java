@@ -9,9 +9,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import io.paysky.data.network.ApiLinks;
+import io.paysky.data.model.SuccessfulCardTransaction;
+import io.paysky.data.model.SuccessfulWalletTransaction;
 import io.paysky.ui.custom.PayButton;
-import io.paysky.util.AppConstant;
 import io.paysky.util.AppUtils;
 
 public class MainActivity extends AppCompatActivity implements View.OnLongClickListener {
@@ -19,19 +19,20 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
     //GUI.
     private EditText merchantIdEditText, terminalIdEditText, amountEditText;
     private TextView paymentStatusTextView;
-    PayButton payButton;
+    private TextView payTextView;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         // find views.
-        payButton = (PayButton) findViewById(R.id.paybtn);
+        payTextView = (TextView) findViewById(R.id.pay_textView);
         merchantIdEditText = findViewById(R.id.merchant_id_editText);
         terminalIdEditText = findViewById(R.id.terminal_id_editText);
         amountEditText = findViewById(R.id.amount_editText);
         paymentStatusTextView = findViewById(R.id.payment_status_textView);
-        payButton.setOnClickListener(new View.OnClickListener() {
+        final PayButton payButton = new PayButton(this);
+        payTextView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 String terminalId = terminalIdEditText.getText().toString().trim();
@@ -42,40 +43,27 @@ public class MainActivity extends AppCompatActivity implements View.OnLongClickL
                     return;
                 }
 
-                // add config
-                boolean enableManualValue = SettingPrefs.getBooleanPrefs(MainActivity.this, "enable_manual", true);
-                boolean enableMagneticValue = SettingPrefs.getBooleanPrefs(MainActivity.this, "enable_magnetic", true);
-                boolean enableQrValue = SettingPrefs.getBooleanPrefs(MainActivity.this, "enable_qr", true);
-                String defaultPayment = SettingPrefs.getStringPrefs(MainActivity.this, "default_payment", "Manual");
-                String serverLink = SettingPrefs.getStringPrefs(MainActivity.this, "server_link", ApiLinks.MAIN_LINK);
-                payButton.setServerLink(serverLink);
-                payButton.setEnableMagneticPayment(enableMagneticValue);
-                payButton.setEnableManualPayment(enableManualValue);
-                payButton.setEnableQrPayment(enableQrValue);
-                if (defaultPayment.equals("Manual")) {
-                    payButton.setDefaultPayment(AppConstant.PaymentMethods.MANUAL);
-                } else if (defaultPayment.equals("Magnetic")) {
-                    payButton.setDefaultPayment(AppConstant.PaymentMethods.MAGNETIC);
-                } else {
-                    payButton.setDefaultPayment(AppConstant.PaymentMethods.QR_READER);
-                }
 
                 // add payments data.
                 payButton.setMerchantId(Long.valueOf(merchantId)); // Merchant id
                 payButton.setTerminalId(Long.valueOf(terminalId)); // Terminal  id
-                payButton.setPayAmount(Double.valueOf(amount)); // Amount
-                payButton.setCurrencyCode(818); // Currency Code
+                payButton.setAmount(Double.valueOf(amount)); // Amount
+                payButton.setCurrencyCode(826); // Currency Code
+                payButton.setMerchantSecureHash("35393434313266342D636662392D343334612D613765332D646365626337663334386363");
                 payButton.createTransaction(new PayButton.PaymentTransactionCallback() {
                     @Override
-                    public void onSuccess(String referenceNumber, String responseCode, String authorizationCode) {
-                        paymentStatusTextView.setText("reference number = " + referenceNumber
-                                + " , response code = " + responseCode + " , authorization code = " + authorizationCode);
+                    public void onCardTransactionSuccess(SuccessfulCardTransaction cardTransaction) {
+                        paymentStatusTextView.setText(cardTransaction.toString());
+                    }
 
+                    @Override
+                    public void onWalletTransactionSuccess(SuccessfulWalletTransaction walletTransaction) {
+                        paymentStatusTextView.setText(walletTransaction.toString());
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                        paymentStatusTextView.setText("payment failed because = " + error.getMessage());
+                        paymentStatusTextView.setText("failed by:- " + error.getMessage());
                     }
                 });
             }

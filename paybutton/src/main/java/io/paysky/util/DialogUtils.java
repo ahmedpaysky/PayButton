@@ -15,6 +15,12 @@ public class DialogUtils {
     public static void showTermsAndConditionsDialog(Context context) {
         new InfoDialog(context).setDialogTitle(R.string.terms_conditions)
                 .setDialogText(R.string.terms_conditions_text)
-                .setButtonText(R.string.ok).showDialog();
+                .showAgreeButton(null).showDialog();
+    }
+
+    public static void showInfoDialog(Context context, String message) {
+        InfoDialog infoDialog = new InfoDialog(context);
+        infoDialog.setTitle(R.string.error);
+        infoDialog.setDialogText(message).showAgreeButton(R.string.ok, null).showDialog();
     }
 }

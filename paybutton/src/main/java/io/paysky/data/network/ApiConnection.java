@@ -1,33 +1,24 @@
 package io.paysky.data.network;
 
-import com.example.paybutton.R;
-
-import java.io.InputStream;
-import java.security.KeyStore;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateFactory;
 import java.util.concurrent.TimeUnit;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-
 import io.paysky.data.model.request.ManualPaymentRequest;
-import io.paysky.data.model.request.MerchantDataRequest;
-import io.paysky.data.model.request.QrGenratorRequest;
+import io.paysky.data.model.request.Process3dTransactionRequest;
+import io.paysky.data.model.request.QrGeneratorRequest;
 import io.paysky.data.model.request.SendReceiptByMailRequest;
 import io.paysky.data.model.request.SmsPaymentRequest;
 import io.paysky.data.model.request.TransactionStatusRequest;
+import io.paysky.data.model.request.Compose3dsTransactionRequest;
 import io.paysky.data.model.response.GenerateQrCodeResponse;
 import io.paysky.data.model.response.ManualPaymentResponse;
-import io.paysky.data.model.response.MerchantDataResponse;
+import io.paysky.data.model.response.MerchantInfoResponse;
+import io.paysky.data.model.response.Process3dTransactionResponse;
 import io.paysky.data.model.response.SendReceiptByMailResponse;
 import io.paysky.data.model.response.SmsPaymentResponse;
 import io.paysky.data.model.response.TransactionStatusResponse;
-import io.paysky.data.network.request.magnetic.MigsRequest;
-import io.paysky.data.network.response.MigsResonse;
+import io.paysky.data.model.request.MerchantInfoRequest;
+import io.paysky.data.model.response.Compose3dsTransactionResponse;
 import okhttp3.OkHttpClient;
-import okhttp3.ResponseBody;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -41,23 +32,6 @@ import retrofit2.converter.gson.GsonConverterFactory;
 
 public class ApiConnection {
 
-    public static void getMerchantData(MerchantDataRequest merchantDataRequest, final ApiResponseListener<MerchantDataResponse> listener) {
-        createConnection().getMerchantData(merchantDataRequest).enqueue(new Callback<MerchantDataResponse>() {
-            @Override
-            public void onResponse(Call<MerchantDataResponse> call, Response<MerchantDataResponse> response) {
-                if (response.isSuccessful()) {
-                    listener.onSuccess(response.body());
-                } else {
-                    onFailure(call, new Exception("fail to connect response code = " + response.code()));
-                }
-            }
-
-            @Override
-            public void onFailure(Call<MerchantDataResponse> call, Throwable t) {
-                listener.onFail(t);
-            }
-        });
-    }
 
     public static void executePayment(ManualPaymentRequest manualPaymentRequest, final ApiResponseListener<ManualPaymentResponse> listener) {
         createConnection().executeManualPayment(manualPaymentRequest)
@@ -97,7 +71,7 @@ public class ApiConnection {
                 });
     }
 
-    public static void generateQrCode(QrGenratorRequest request, final ApiResponseListener<GenerateQrCodeResponse> listener) {
+    public static void generateQrCode(QrGeneratorRequest request, final ApiResponseListener<GenerateQrCodeResponse> listener) {
         createConnection().generateQrCode(request)
                 .enqueue(new Callback<GenerateQrCodeResponse>() {
                     @Override
@@ -135,24 +109,6 @@ public class ApiConnection {
                 });
     }
 
-    public static void getTerminalConfig(String terminalId, final ApiResponseListener<ResponseBody> listener) {
-        createConnection().getTerminalConfig(terminalId)
-                .enqueue(new Callback<ResponseBody>() {
-                    @Override
-                    public void onResponse(Call<ResponseBody> call, Response<ResponseBody> response) {
-                        if (response.isSuccessful()) {
-                            listener.onSuccess(response.body());
-                        } else {
-                            onFailure(call, new Exception("fail to connect response code = " + response.code()));
-                        }
-                    }
-
-                    @Override
-                    public void onFailure(Call<ResponseBody> call, Throwable t) {
-                        listener.onFail(t);
-                    }
-                });
-    }
 
     public static void requestToPay(SmsPaymentRequest smsPaymentRequest, final ApiResponseListener<SmsPaymentResponse> listener) {
         createConnection().requestToPay(smsPaymentRequest)
@@ -179,24 +135,55 @@ public class ApiConnection {
                 .readTimeout(60, TimeUnit.SECONDS).build();
 
         return new Retrofit.Builder()
-                .baseUrl(ApiLinks.MAIN_LINK)
+                .baseUrl(ApiLinks.GRAY_LINK)
                 .client(client)
                 .addConverterFactory(GsonConverterFactory.create())
                 .build()
                 .create(ApiInterface.class);
     }
 
-    public static void createMagneticTransaction(MigsRequest migsRequest, final ApiResponseListener<MigsResonse> listener) {
-        createConnection().payWithMagneticCard(migsRequest).enqueue(new Callback<MigsResonse>() {
+    public static void getMerchantInfo(MerchantInfoRequest request, final ApiResponseListener<MerchantInfoResponse> listener) {
+        createConnection().getMerchantInfo(request)
+                .enqueue(new Callback<MerchantInfoResponse>() {
+                    @Override
+                    public void onResponse(Call<MerchantInfoResponse> call, Response<MerchantInfoResponse> response) {
+                        listener.onSuccess(response.body());
+                    }
+
+                    @Override
+                    public void onFailure(Call<MerchantInfoResponse> call, Throwable t) {
+                        listener.onFail(t);
+                    }
+                });
+    }
+
+    public static void compose3dsTransaction(Compose3dsTransactionRequest request, final ApiResponseListener<Compose3dsTransactionResponse> listener) {
+        createConnection().compose3dpsTransaction(request)
+                .enqueue(new Callback<Compose3dsTransactionResponse>() {
+                    @Override
+                    public void onResponse(Call<Compose3dsTransactionResponse> call, Response<Compose3dsTransactionResponse> response) {
+                        listener.onSuccess(response.body());
+                    }
+
+                    @Override
+                    public void onFailure(Call<Compose3dsTransactionResponse> call, Throwable t) {
+                        listener.onFail(t);
+                    }
+                });
+    }
+
+    public static void process3dTransaction(Process3dTransactionRequest request, final ApiResponseListener<Process3dTransactionResponse> listener) {
+        createConnection().process3dTransaction(request).enqueue(new Callback<Process3dTransactionResponse>() {
             @Override
-            public void onResponse(Call<MigsResonse> call, Response<MigsResonse> response) {
+            public void onResponse(Call<Process3dTransactionResponse> call, Response<Process3dTransactionResponse> response) {
                 listener.onSuccess(response.body());
             }
 
             @Override
-            public void onFailure(Call<MigsResonse> call, Throwable t) {
+            public void onFailure(Call<Process3dTransactionResponse> call, Throwable t) {
                 listener.onFail(t);
             }
         });
     }
+
 }

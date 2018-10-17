@@ -1,10 +1,6 @@
 package io.paysky.ui.fragment.paymentsuccess;
 
 
-import android.app.ProgressDialog;
-import android.media.Ringtone;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -20,26 +16,25 @@ import android.widget.Toast;
 import com.example.paybutton.R;
 
 import io.paysky.data.model.ReceiptData;
-import io.paysky.ui.base.ActivityHelper;
-import io.paysky.ui.base.BaseActivity;
+import io.paysky.ui.activity.payment.PaymentActivity;
 import io.paysky.ui.base.BaseFragment;
 import io.paysky.util.AppUtils;
+import io.paysky.util.DialogUtils;
 import io.paysky.util.PrintReceiptListener;
 import io.paysky.util.ReceiptManager;
 
 
-public class PaymentApprovedFragment extends BaseFragment implements View.OnClickListener, PrintReceiptListener {
+public class PaymentApprovedFragment extends BaseFragment implements View.OnClickListener, PrintReceiptListener, PaymentApprovedView {
 
     //Objects.
-    private ActivityHelper activityHelper;
-    private PaymentApprovedManager paymentApprovedManager;
+    private PaymentActivity activity;
     ReceiptManager receiptManager;
     private ReceiptData transactionData;
-    private BaseActivity baseActivity;
+    private PaymentApprovedPresenter presenter;
     //GUI.
     private EditText emailEditText;
-    private ProgressDialog progressDialog;
-    private LinearLayout sendEmailLayout, sendEmailNotificationLayout, sendEmailSuccessLayout;
+    private LinearLayout sendEmailLayout,
+            sendEmailNotificationLayout, sendEmailSuccessLayout;
     private TextView mailSentTextView;
     private Button printReceipt;
     //Variables.
@@ -52,11 +47,12 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityHelper = (ActivityHelper) getActivity();
-        baseActivity = (BaseActivity) getActivity();
+        activity = (PaymentActivity) getActivity();
         extractBundle();
-        paymentApprovedManager = new PaymentApprovedManager(this);
+        presenter = new PaymentApprovedPresenter();
+        presenter.attachView(this);
     }
+
 
     private void extractBundle() {
         Bundle bundle = getArguments();
@@ -68,16 +64,9 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+
         // Inflate the layout for this fragment.
-
-        try {
-            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-            Ringtone r = RingtoneManager.getRingtone(baseActivity, notification);
-            r.play();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
+        AppUtils.playRingtome(getActivity());
         return inflater.inflate(R.layout.fragment_payment_approved, container, false);
     }
 
@@ -86,11 +75,11 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         initView(view);
-        activityHelper.setHeaderIcon(R.drawable.ic_close);
-        activityHelper.setHeaderIconClickListener(new View.OnClickListener() {
+        activity.setHeaderIcon(R.drawable.ic_close);
+        activity.setHeaderIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                baseActivity.finish();
+                activity.finish();
             }
         });
         receiptManager = new ReceiptManager(view, transactionData, this);
@@ -99,15 +88,19 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
     private void initView(View view) {
         // find views.
         TextView approvedTextView = view.findViewById(R.id.approved_textView);
-        baseActivity.showHtmlText(approvedTextView, R.string.transaction_success);
+        AppUtils.showHtmlText(approvedTextView, R.string.transaction_success);
         TextView authNumberTextView = view.findViewById(R.id.auth_number_textView);
         authNumberTextView.setText(getString(R.string.auth_number) + " #" + transactionData.authNumber);
         TextView trxIdTextView = view.findViewById(R.id.trx_id_textView);
-        trxIdTextView.setText(getString(R.string.trx_id) + " #" + transactionData.rrn);
+        if (transactionData.rrn.length() > 30) {
+            trxIdTextView.setText(getString(R.string.trx_id) + " #" + transactionData.rrn.substring(transactionData.rrn.length() - 6));
+        } else {
+            trxIdTextView.setText(getString(R.string.trx_id) + " #" + transactionData.rrn);
+        }
         Button closeButton = view.findViewById(R.id.close_button);
         closeButton.setOnClickListener(this);
         printReceipt = view.findViewById(R.id.print_receipt_button);
-        if (AppUtils.isPaymentMachine(getContext())) {
+        if (AppUtils.isPaymentMachine()) {
             printReceipt.setVisibility(View.VISIBLE);
             printReceipt.setText(R.string.merchant_copy);
             printReceipt.setOnClickListener(this);
@@ -129,7 +122,7 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
     public void onClick(View view) {
         int i = view.getId();
         if (i == R.id.close_button) {
-            baseActivity.finish();
+            activity.finish();
         } else if (i == R.id.send_email_button) {
             AppUtils.hideKeyboard(view);
             sendEmailButtonClick();
@@ -153,23 +146,9 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
             return;
         }
         int RECEIPT = 1;
-        paymentApprovedManager.sendEmail(email, transactionData.terminalId, transactionData.merchantId,
-                transactionData.refNumber, transactionData.channelName, transactionData.rrn,
+        presenter.sendEmail(transactionData.secureHashKey, email, transactionData.terminalId, transactionData.merchantId,
+                transactionData.receiptNumber, transactionData.channelName, transactionData.rrn,
                 RECEIPT);
-    }
-
-
-    void showProgressDialog() {
-        if (progressDialog == null) {
-            progressDialog = AppUtils.createProgressDialog(baseActivity, R.string.please_wait);
-        }
-        progressDialog.show();
-    }
-
-    void dismissProgressDialog() {
-        if (progressDialog != null) {
-            progressDialog.dismiss();
-        }
     }
 
 
@@ -202,12 +181,13 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
             hideSendNotificationEmailLayout();
             hideSendEmailLayout();
             showSentEmailSuccessLayout();
-            // String emailSent = String.format(Locale.US, , email);
-            baseActivity.showHtmlText(mailSentTextView, sendMail);
-        } else {
-            baseActivity.showHtmlText(mailSentTextView, sendMail);
         }
+        AppUtils.showHtmlText(mailSentTextView, sendMail);
+    }
 
+    @Override
+    public void showErrorDialog(int error) {
+        DialogUtils.showInfoDialog(activity ,getString(error));
     }
 
     @Override

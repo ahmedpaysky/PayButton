@@ -12,17 +12,17 @@ import android.widget.TextView;
 
 import com.example.paybutton.R;
 
-import io.paysky.ui.base.ActivityHelper;
+import io.paysky.ui.activity.payment.PaymentActivity;
 import io.paysky.ui.base.BaseActivity;
 import io.paysky.ui.base.BaseFragment;
+import io.paysky.util.AppUtils;
 
 
 public class PaymentFailedFragment extends BaseFragment implements View.OnClickListener {
 
 
     //Objects,
-    private ActivityHelper activityHelper;
-    private BaseActivity baseActivity;
+    private PaymentActivity activity;
     //GUI.
     private Button closeButton;
     private Button tryAgainButton;
@@ -38,8 +38,7 @@ public class PaymentFailedFragment extends BaseFragment implements View.OnClickL
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        activityHelper = (ActivityHelper) getActivity();
-        baseActivity = (BaseActivity) getActivity();
+        activity = (PaymentActivity) getActivity();
         extractBundle();
     }
 
@@ -57,11 +56,11 @@ public class PaymentFailedFragment extends BaseFragment implements View.OnClickL
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        activityHelper.setHeaderIcon(R.drawable.ic_close);
-        activityHelper.setHeaderIconClickListener(new View.OnClickListener() {
+        activity.setHeaderIcon(R.drawable.ic_close);
+        activity.setHeaderIconClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                baseActivity.finish();
+                activity.finish();
             }
         });
         initView(view);
@@ -74,16 +73,16 @@ public class PaymentFailedFragment extends BaseFragment implements View.OnClickL
         tryAgainButton.setOnClickListener(this);
         transactionDeclinedTextView = view.findViewById(R.id.transaction_declined_textView);
         declineCauseTextView = view.findViewById(R.id.declined_cause_textView);
-        ((BaseActivity) baseActivity).showHtmlText(transactionDeclinedTextView, R.string.transaction_declined);
+        AppUtils.showHtmlText(transactionDeclinedTextView, R.string.transaction_declined);
         declineCauseTextView.setText(declineCause);
     }
 
     @Override
     public void onClick(View view) {
         if (view.getId() == R.id.close_button) {
-            baseActivity.onBackPressed();
+            activity.onBackPressed();
         } else {
-            baseActivity.onBackPressed();
+            activity.onBackPressed();
         }
     }
 }

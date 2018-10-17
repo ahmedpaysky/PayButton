@@ -2,21 +2,12 @@ package io.paysky.ui.custom;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.ColorRes;
-import android.support.annotation.DrawableRes;
-import android.support.annotation.Nullable;
-import android.support.annotation.RequiresApi;
-import android.util.AttributeSet;
-import android.view.View;
-import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import com.example.paybutton.R;
 
 import io.paysky.data.event.PaymentStatusEvent;
-import io.paysky.ui.activity.pay.PayActivity;
+import io.paysky.data.model.SuccessfulCardTransaction;
+import io.paysky.data.model.SuccessfulWalletTransaction;
+import io.paysky.ui.activity.payment.PaymentActivity;
 import io.paysky.util.AppConstant;
 import io.paysky.util.PaymentObservable;
 import io.paysky.util.PaymentObserver;
@@ -26,83 +17,21 @@ import io.paysky.util.PaymentObserver;
  */
 
 
-public class PayButton extends LinearLayout implements PaymentObserver {
+public class PayButton implements PaymentObserver {
 
     //Variables.
-    long merchantId = 0;
-    long terminalId = 0;
-    Double payAmount = 0.0;
-    int currencyCode = 0;
-    String notificationValue = null;
-    private boolean enableManualPayment, enableMagneticPayment, enableQrPayment;
-    private String serverLink;
-    private int defaultPayment;
+    private long merchantId = 0;
+    private long terminalId = 0;
+    private double amount = 0.0;
+    private int currencyCode = 0;
+    private String merchantSecureHash;
     //Objects.
-    PaymentTransactionCallback transactionCallback;
-    NotificationType notificationType;
-    //GUI.
-    private TextView payNow;
+    private PaymentTransactionCallback transactionCallback;
+    private Context context;
 
-
-    public boolean isEnableManualPayment() {
-        return enableManualPayment;
-    }
-
-    public void setEnableManualPayment(boolean enableManualPayment) {
-        this.enableManualPayment = enableManualPayment;
-    }
-
-    public boolean isEnableMagneticPayment() {
-        return enableMagneticPayment;
-    }
-
-    public void setEnableMagneticPayment(boolean enableMagneticPayment) {
-        this.enableMagneticPayment = enableMagneticPayment;
-    }
-
-    public boolean isEnableQrPayment() {
-        return enableQrPayment;
-    }
-
-    public void setEnableQrPayment(boolean enableQrPayment) {
-        this.enableQrPayment = enableQrPayment;
-    }
-
-    public int getDefaultPayment() {
-        return defaultPayment;
-    }
-
-    public void setDefaultPayment(int defaultPayment) {
-        this.defaultPayment = defaultPayment;
-    }
-
-    public String getServerLink() {
-        return serverLink;
-    }
-
-    public void setServerLink(String serverLink) {
-        this.serverLink = serverLink;
-    }
 
     public PayButton(Context context) {
-        super(context);
-        inflateView();
-    }
-
-    public PayButton(Context context, @Nullable AttributeSet attrs) {
-        super(context, attrs);
-        inflateView();
-    }
-
-    public PayButton(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
-        super(context, attrs, defStyleAttr);
-        inflateView();
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    public PayButton(Context context, AttributeSet attrs, int defStyleAttr, int defStyleRes) {
-        super(context, attrs, defStyleAttr, defStyleRes);
-        inflateView();
+        this.context = context;
     }
 
 
@@ -122,11 +51,11 @@ public class PayButton extends LinearLayout implements PaymentObserver {
     }
 
 
-    public void setPayAmount(double amount) {
+    public void setAmount(double amount) {
         if (amount <= 0) {
             throw new IllegalArgumentException("amount must be more than 0");
         }
-        this.payAmount = amount;
+        this.amount = amount;
     }
 
     public void setCurrencyCode(int currencyCode) {
@@ -136,64 +65,54 @@ public class PayButton extends LinearLayout implements PaymentObserver {
         this.currencyCode = currencyCode;
     }
 
-
-    public void setNotificationType(NotificationType notificationType) {
-        this.notificationType = notificationType;
+    public void setMerchantSecureHash(String merchantSecureHash) {
+        this.merchantSecureHash = merchantSecureHash;
     }
-
-    public void setNotificationValue(String notificationValue) {
-        this.notificationValue = notificationValue;
-    }
-
-
-    void inflateView() {
-        inflate(getContext(), R.layout.custom_pay_btn, this);
-        payNow = findViewById(R.id.pay_now);
-    }
-
 
     private void openPaymentActivity() {
         Bundle bundle = new Bundle();
-        bundle.putLong(AppConstant.BundleKeys.TERMINAL_ID, terminalId);
-        bundle.putLong(AppConstant.BundleKeys.MERCHANT_ID, merchantId);
-        bundle.putDouble(AppConstant.BundleKeys.PAY_AMOUNT, payAmount);
-        bundle.putString(AppConstant.BundleKeys.RECEIVER_MAIL, notificationValue);
-        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MANUAL, enableManualPayment);
-        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_MAGNETIC, enableMagneticPayment);
-        bundle.putBoolean(AppConstant.BundleKeys.ENABLE_QR, enableQrPayment);
-        bundle.putInt(AppConstant.BundleKeys.DEFAULT_PAYMENT, defaultPayment);
-        bundle.putString(AppConstant.BundleKeys.SERVER_LINK, serverLink);
-        Intent intent = new Intent(getContext(), PayActivity.class);
+        bundle.putString(AppConstant.BundleKeys.MERCHANT_ID, merchantId + "");
+        bundle.putString(AppConstant.BundleKeys.TERMINAL_ID, terminalId + "");
+        bundle.putDouble(AppConstant.BundleKeys.PAY_AMOUNT, amount);
+        bundle.putString(AppConstant.BundleKeys.SECURE_HASH_KEY, merchantSecureHash);
+        if (currencyCode != 0) {
+            bundle.putString(AppConstant.BundleKeys.CURRENCY_CODE, currencyCode + "");
+        }
+        Intent intent = new Intent(context, PaymentActivity.class);
         intent.putExtras(bundle);
-        getContext().startActivity(intent);
+        context.startActivity(intent);
     }
 
     public void createTransaction(PaymentTransactionCallback itemClickListener) {
         this.transactionCallback = itemClickListener;
-        if (merchantId == 0 || terminalId == 0 || currencyCode == 0 || payAmount == 0) {
-            transactionCallback.onError(new Exception("Please Enter The Merchant and terminal and Currency Code and Amout"));
-            return;
-        }
-        if (notificationType == NotificationType.EMAIL && notificationValue.equals("")) {
-            transactionCallback.onError(new Exception("Please Enter notification value"));
-            return;
-        }
+        validateUserInputs();
         openPaymentActivity();
         PaymentObservable.addObserver(this);
     }
 
+    private void validateUserInputs() {
+        if (merchantId == 0 || terminalId == 0 || amount == 0 || merchantSecureHash == null || merchantSecureHash.isEmpty()) {
+            throw new IllegalStateException("add all required fields to create transaction");
+        }
+    }
+
     @Override
     public void sendPaymentStatus(PaymentStatusEvent paymentStatusEvent) {
-        if (paymentStatusEvent.referenceNumber != null) {
-            transactionCallback.onSuccess(paymentStatusEvent.referenceNumber, paymentStatusEvent.responseCode,
-                    paymentStatusEvent.authorizationCode);
+        if (paymentStatusEvent.failException == null) {
+            if (paymentStatusEvent.cardTransaction != null) {
+                transactionCallback.onCardTransactionSuccess(paymentStatusEvent.cardTransaction);
+            } else {
+                transactionCallback.onWalletTransactionSuccess(paymentStatusEvent.walletTransaction);
+            }
         } else {
             transactionCallback.onError(paymentStatusEvent.failException);
         }
     }
 
     public interface PaymentTransactionCallback {
-        void onSuccess(String referenceNumber, String responseCode, String authorizationCode);
+        void onCardTransactionSuccess(SuccessfulCardTransaction cardTransaction);
+
+        void onWalletTransactionSuccess(SuccessfulWalletTransaction walletTransaction);
 
         void onError(Throwable error);
     }
@@ -204,19 +123,5 @@ public class PayButton extends LinearLayout implements PaymentObserver {
         PaymentObservable.removeObserver(this);
         super.finalize();
     }
-
-
-    public void setTextColor(@ColorRes int color) {
-        payNow.setTextColor(getContext().getResources().getColor(color));
-    }
-
-    public void setPayButtonBackground(@DrawableRes int background) {
-        setBackgroundResource(background);
-    }
-
-    public void setPayButtonBackgroundColor(@ColorRes int color) {
-        setBackgroundColor(getContext().getResources().getColor(color));
-    }
-
 
 }

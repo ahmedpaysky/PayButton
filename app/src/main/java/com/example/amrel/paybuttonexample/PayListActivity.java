@@ -10,8 +10,5 @@ public class PayListActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pay_list);
-        ListView listView = findViewById(R.id.list);
-        PayListAdapter payListAdapter = new PayListAdapter(this);
-        listView.setAdapter(payListAdapter);
     }
 }

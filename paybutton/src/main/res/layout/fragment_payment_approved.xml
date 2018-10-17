@@ -17,10 +17,11 @@
         <TableRow android:gravity="center">
 
             <ImageView
-                android:layout_width="110dp"
-                android:layout_height="110dp"
-                android:layout_margin="4dp"
+                android:layout_width="@dimen/_90sdp"
+                android:layout_height="@dimen/_90sdp"
+                android:layout_margin="@dimen/_2sdp"
                 android:src="@drawable/ic_payment_approved" />
+
         </TableRow>
 
         <TextView
@@ -70,7 +71,7 @@
             android:layout_height="@dimen/_36sdp"
             android:layout_marginLeft="@dimen/_10sdp"
             android:layout_marginRight="@dimen/_10sdp"
-            android:layout_marginTop="@dimen/_8sdp"
+            android:layout_marginTop="@dimen/_4sdp"
             android:background="@drawable/baybutton_proceed_button"
             android:text="@string/print" />
 

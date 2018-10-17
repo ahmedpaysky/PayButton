@@ -5,23 +5,20 @@ import com.google.gson.annotations.SerializedName;
 import javax.annotation.Generated;
 
 @Generated("com.robohorse.robopojogenerator")
-public class TransactionStatusRequest{
+public class TransactionStatusRequest {
 
-	@SerializedName("TxnId")
-	public int txnId;
+    @SerializedName("TxnId")
+    public long txnId;
 
-	@SerializedName("SecureHash")
-	public String secureHash;
+    @SerializedName("SecureHash")
+    public String secureHash;
 
-	@SerializedName("DateTimeLocalTrxn")
-	public String dateTimeLocalTrxn;
+    @SerializedName("DateTimeLocalTrxn")
+    public String dateTimeLocalTrxn;
 
-	@SerializedName("ClientId")
-	public long clientId;
+    @SerializedName("TerminalId")
+    public String terminalId;
 
-	@SerializedName("TerminalId")
-	public String terminalId;
-
-	@SerializedName("MerchantId")
-	public String merchantId;
+    @SerializedName("MerchantId")
+    public String merchantId;
 }

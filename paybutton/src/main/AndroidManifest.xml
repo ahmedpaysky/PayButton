@@ -10,7 +10,7 @@
         android:name="android.support.multidex.MultiDexApplication">
         <activity
 
-            android:name="io.paysky.ui.activity.pay.PayActivity"
+            android:name="io.paysky.ui.activity.payment.PaymentActivity"
             android:screenOrientation="portrait"
             android:theme="@style/AppTheme" />
     </application>

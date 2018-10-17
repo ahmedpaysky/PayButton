@@ -7,24 +7,27 @@ import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Typeface;
+import android.media.Ringtone;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
+import android.support.v4.app.FragmentActivity;
+import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
+import com.example.paybutton.R;
+
 import org.greenrobot.eventbus.EventBus;
-import org.simpleframework.xml.Serializer;
-import org.simpleframework.xml.core.Persister;
 
 import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import io.paysky.data.model.response.terminalconfig.config.DEVICE;
 
 /**
  * Created by Paysky-202 on 5/10/2018.
@@ -62,6 +65,18 @@ public class AppUtils {
         return progressDialog;
     }
 
+    public static ProgressDialog createProgressDialog(Context context, String text) {
+        ProgressDialog progressDialog = new ProgressDialog(context);
+        progressDialog.setCancelable(false);
+        progressDialog.setMessage(text);
+        return progressDialog;
+    }
+
+
+    public static ProgressDialog createProgressDialog(Context context) {
+        return createProgressDialog(context, R.string.please_wait);
+    }
+
     public static String getDateTimeLocalTrxn() {
 
         int arg1 = Calendar.getInstance().get(Calendar.YEAR);
@@ -82,14 +97,13 @@ public class AppUtils {
         int arg7 = Calendar.getInstance().get(Calendar.MILLISECOND);
         arg2 = arg2 + 1;
 
-        String nowData = "" + new StringBuilder().append(arg1s).append("")
+        return "" + new StringBuilder().append(arg1s).append("")
 
                 .append((arg2 < 10 ? "0" + arg2 : arg2)).append("").append((arg3 < 10 ? "0" + arg3 : arg3))
 
                 .append((arg4 < 10 ? "0" + arg4 : arg4)).append((arg5 < 10 ? "0" + arg5 : arg5))
 
                 .append((arg6 < 10 ? "0" + arg6 : arg6)).append("" + arg7);
-        return nowData;
     }
 
     public static String generateRandomNumber() {
@@ -114,17 +128,6 @@ public class AppUtils {
         pattern = Pattern.compile(EMAIL_PATTERN);
         matcher = pattern.matcher(email);
         return matcher.matches();
-    }
-
-    public static DEVICE getTerminalConfig(Context context) {
-        String terminalConfig = AppCache.getTerminalConfig(context);
-        Serializer serializer = new Persister();
-        try {
-            return serializer.read(DEVICE.class, terminalConfig);
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public static boolean validPhone(String phone) {
@@ -154,19 +157,11 @@ public class AppUtils {
                 .replace("۹", "9").replace("۰", "0").replace("٫", ".");
     }
 
- /*   public static boolean isPOSDevice() {
-        String model = Build.MODEL;
-        return model.equals("SQ27");
-    }*/
-
-    public static boolean isPaymentMachine(Context context) {
+    public static boolean isPaymentMachine() {
         String model = Build.MODEL;
         boolean isSq27 = model.equals("SQ27");
         boolean isI900s = model.equals("i9000S");
-        if (isSq27 || isI900s) {
-            return true;
-        }
-        return false;
+        return isSq27 || isI900s;
     }
 
     public static int formatPaymentAmountToServer(String payAmount) {
@@ -194,6 +189,32 @@ public class AppUtils {
         Typeface typeface = Typeface.createFromAsset(views[0].getContext().getAssets(), font);
         for (TextView textView : views) {
             textView.setTypeface(typeface);
+        }
+    }
+
+    public static void showHtmlText(TextView textView, @StringRes int text) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            textView.setText(Html.fromHtml(textView.getContext().getString(text), Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            textView.setText(Html.fromHtml(textView.getContext().getString(text)));
+        }
+    }
+
+    public static void showHtmlText(TextView textView, String text) {
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+            textView.setText(Html.fromHtml(text, Html.FROM_HTML_MODE_LEGACY));
+        } else {
+            textView.setText(Html.fromHtml(text));
+        }
+    }
+
+    public static void playRingtome(Activity activity) {
+        try {
+            Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+            Ringtone r = RingtoneManager.getRingtone(activity, notification);
+            r.play();
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

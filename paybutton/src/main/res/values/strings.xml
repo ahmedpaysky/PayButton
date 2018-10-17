@@ -1,16 +1,12 @@
 <resources>
     <string name="app_name">PayButton</string>
     <string name="pay_now">Pay Now</string>
-    <string name="quick_payment_from"><![CDATA[
-          <b>Quick Payment form</b>
-    ]]></string>
     <string name="merchant">MERCHANT</string>
     <string name="amount">AMOUNT</string>
     <string name="arabic">عربى</string>
     <string name="terms_conditions">Terms and conditions</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="card">Card</string>
     <string name="wallet">Wallet</string>
     <string name="enter_card_data">Please enter card data</string>
@@ -31,7 +27,6 @@
     <string name="auth_number">Auth Code:</string>
     <string name="trx_id">Transaction No:</string>
     <string name="close">Close</string>
-    <string name="send_receipt">Send Receipt</string>
     <string name="send_notification">Send receipt</string>
     <string name="email_hint">Email</string>
     <string name="send">Send</string>
@@ -46,15 +41,7 @@
     ]]></string>
     <string name="try_again">Try again</string>
     <string name="open_wallet_app">Please Scan the QR code with your Wallet app. to make payment.</string>
-    <string name="enter_send_money">1-Enter send money</string>
-    <string name="help">Help?</string>
-    <string name="qr_code">QR Code</string>
-    <string name="sms">SMS</string>
     <string name="quick_payment_form">Quick Payment form</string>
-    <string name="select_send_money">2-Select send money</string>
-    <string name="select_qr_code">3-Select QR code</string>
-    <string name="scan_qr_code">4-Scan QR code on the left</string>
-    <string name="enter_pin">5-Then enter m-PIN</string>
     <string name="enter_mobile_number">Enter your wallet mobil number</string>
     <string name="mobile_number">Mobile number</string>
     <string name="send_otp">Send</string>
@@ -64,7 +51,6 @@
     <string name="sms_received_within">Sms should be received within</string>
     <string name="seconds">Seconds</string>
     <string name="terms_conditions_text">This is terms and conditions to use pay sky payment service integeration.</string>
-    <string name="swipe">Read Card</string>
     <string name="send_sms_success">Send sms success.</string>
     <string name="or">OR</string>
     <string name="cant_scan_code">Can\'t scan Qr code? \nSend payment request to the entered mobile number.</string>
@@ -72,17 +58,15 @@
     <string name="invalid_expire_date_date">Invalid expire date</string>
     <string name="egp">EGP</string>
     <string name="print">Print receipt</string>
-    <string name="accepted_operation">Accepted Operation</string>
-    <string name="confirm_receipt_info">Confirm receipt info</string>
-    <string name="enter_manual">Enter card data</string>
-    <string name="no_payment_selected">No payment method selected.</string>
-    <string name="read_qr">Read Qr code</string>
-    <string name="magnetic">Read card</string>
-    <string name="device_not_support_magnetic">Device not support magnetic card payment.</string>
     <string name="merchant_copy__">---Merchant copy---</string>
     <string name="customer_copy__">---Customer copy---</string>
     <string name="merchant_copy">Merchant copy</string>
     <string name="customer_copy">Customer copy</string>
     <string name="powered_paysky">Powered by PaySky.io</string>
     <string name="qr">Qr Scan</string>
+    <string name="failed_load_merchant_data">Failed to load merchant data, try again?</string>
+    <string name="cancel">Cancel</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

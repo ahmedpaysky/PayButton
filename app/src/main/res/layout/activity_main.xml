@@ -14,9 +14,8 @@
 
 
         <ImageView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="@dimen/_8sdp"
+            android:layout_width="@dimen/_70sdp"
+            android:layout_height="@dimen/_70sdp"
             android:src="@drawable/ic_wallet_sdk" />
 
 
@@ -26,7 +25,6 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="@dimen/_30sdp"
             android:gravity="center"
-            android:padding="2dp"
             android:text="@string/app_name"
             android:textSize="16sp" />
 
@@ -51,7 +49,7 @@
                 android:layout_weight="7"
                 android:hint="merchant id"
                 android:inputType="number"
-                android:text="11000000031" />
+                android:text="11400000001" />
         </LinearLayout>
 
         <LinearLayout
@@ -75,7 +73,7 @@
                 android:layout_weight="7"
                 android:hint="terminal id"
                 android:inputType="number"
-                android:text="800038" />
+                android:text="10002000" />
         </LinearLayout>
 
         <LinearLayout
@@ -126,27 +124,27 @@
         </LinearLayout>
 
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="8dp"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="@dimen/_8sdp"
-            android:background="@drawable/button_blue_selector">
 
-            <io.paysky.ui.custom.PayButton
-                android:id="@+id/paybtn"
+            <TextView
+                android:id="@+id/pay_textView"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center" />
-        </LinearLayout>
+                android:layout_height="@dimen/_34sdp"
+                android:layout_marginEnd="8dp"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="@dimen/_8sdp"
+                android:background="@drawable/button_blue_selector"
+                android:layout_gravity="center_horizontal"
+                android:text="PAY"
+                android:gravity="center"
+                android:textSize="@dimen/_14ssp"
+                android:textColor="#FFF" />
 
 
         <TextView
             android:id="@+id/payment_status_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:gravity="center" />
 
     </LinearLayout>

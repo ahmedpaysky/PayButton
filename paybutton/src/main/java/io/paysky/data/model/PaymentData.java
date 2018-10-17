@@ -3,27 +3,30 @@ package io.paysky.data.model;
 import android.os.Parcel;
 import android.os.Parcelable;
 
-import io.paysky.util.AppConstant;
-
 public class PaymentData implements Parcelable {
 
-    public String merchantId, terminalId, amount,
-            receiverMail, defaultPayment;
-    public boolean enableQr, enableMagnetic, enableManual;
+    public String merchantId, terminalId;
+    public String merchantName, receiverMail;
+    public double amount;
+    public String amountFormatted;
+    public String secureHashKey;
+    public String currencyCode;
+    public boolean is3dsEnabled;
 
-    public PaymentData(){
+    public PaymentData() {
 
     }
 
     protected PaymentData(Parcel in) {
         merchantId = in.readString();
         terminalId = in.readString();
-        amount = in.readString();
+        merchantName = in.readString();
         receiverMail = in.readString();
-        defaultPayment = in.readString();
-        enableQr = in.readByte() != 0;
-        enableMagnetic = in.readByte() != 0;
-        enableManual = in.readByte() != 0;
+        amount = in.readDouble();
+        amountFormatted = in.readString();
+        secureHashKey = in.readString();
+        currencyCode = in.readString();
+        is3dsEnabled = in.readInt() == 0;
     }
 
     public static final Creator<PaymentData> CREATOR = new Creator<PaymentData>() {
@@ -47,17 +50,12 @@ public class PaymentData implements Parcelable {
     public void writeToParcel(Parcel parcel, int i) {
         parcel.writeString(merchantId);
         parcel.writeString(terminalId);
-        parcel.writeString(amount);
+        parcel.writeString(merchantName);
         parcel.writeString(receiverMail);
-        parcel.writeString(defaultPayment);
-        parcel.writeByte((byte) (enableQr ? 1 : 0));
-        parcel.writeByte((byte) (enableMagnetic ? 1 : 0));
-        parcel.writeByte((byte) (enableManual ? 1 : 0));
+        parcel.writeDouble(amount);
+        parcel.writeString(amountFormatted);
+        parcel.writeString(secureHashKey);
+        parcel.writeString(currencyCode);
+        parcel.writeInt((is3dsEnabled) ? 1 : 0);
     }
-
-    public enum DefaultPayment {
-        MANUAL, MAGNETIC, QR_CODE;
-    }
-
-
 }

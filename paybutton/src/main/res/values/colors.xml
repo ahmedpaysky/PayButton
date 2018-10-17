@@ -4,9 +4,7 @@
     <color name="accentColor">#00a7f6</color>
     <color name="paybutton_app_background">#f3f3f3</color>
     <color name="backgroundColorDark">#f1f2f3</color>
-    <color name="font_gray_color1">#60605f</color>
     <color name="font_gray_color2">#878d91</color>
-    <color name="font_gray_color3">#787b7d</color>
-    <color name="paybutton_header_background">#00a7f6</color>
-    
+    <color name="font_gray_color3">#2D3134</color>
+
 </resources>

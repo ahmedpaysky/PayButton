@@ -24,18 +24,18 @@ import java.util.Hashtable;
 
 public class ConvertQrCodToBitmapTask extends AsyncTask<String, String, Bitmap> {
 
-    private WeakReference<ImageView> qrImageView;
-    private ProgressDialog progressDialog;
 
-    public ConvertQrCodToBitmapTask(ImageView qrImageView) {
-        this.qrImageView = new WeakReference<>(qrImageView);
-        progressDialog = AppUtils.createProgressDialog(qrImageView.getContext(), R.string.please_wait);
+    private WeakReference<QrBitmapLoadListener> loadListener;
+    private int sizePx;
+
+    public ConvertQrCodToBitmapTask(QrBitmapLoadListener loadListener, int sizePx) {
+        this.loadListener = new WeakReference<>(loadListener);
+        this.sizePx = sizePx;
     }
 
     @Override
     protected void onPreExecute() {
         super.onPreExecute();
-        progressDialog.show();
     }
 
     @Override
@@ -47,15 +47,8 @@ public class ConvertQrCodToBitmapTask extends AsyncTask<String, String, Bitmap> 
         Bitmap ja = null;
 
         final QRCodeWriter writer = new QRCodeWriter();
-        ImageView imageView = qrImageView.get();
-        if (imageView == null) return null;
-        Resources resources = imageView.getContext().getResources();
 
-        float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP,
-
-                300, resources.getDisplayMetrics());
-
-        BitMatrix bitMatrix = null;
+        BitMatrix bitMatrix;
 
         try {
 
@@ -65,13 +58,13 @@ public class ConvertQrCodToBitmapTask extends AsyncTask<String, String, Bitmap> 
 
             bitMatrix = writer.encode(path,
 
-                    BarcodeFormat.QR_CODE, Math.round(px)
+                    BarcodeFormat.QR_CODE, Math.round(sizePx)
 
-                    , Math.round(px), hints);
+                    , Math.round(sizePx), hints);
 
-            int width = Math.round(px);
+            int width = Math.round(sizePx);
 
-            int height = Math.round(px);
+            int height = Math.round(sizePx);
 
             Bitmap bmp = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
 
@@ -95,9 +88,13 @@ public class ConvertQrCodToBitmapTask extends AsyncTask<String, String, Bitmap> 
 
     @Override
     protected void onPostExecute(Bitmap result) {
-        ImageView imageView = qrImageView.get();
-        progressDialog.dismiss();
-        if (imageView == null) return;
-        imageView.setImageBitmap(result);
+        QrBitmapLoadListener qrBitmapLoadListener = loadListener.get();
+        if (qrBitmapLoadListener != null) {
+            if (result == null) {
+                qrBitmapLoadListener.onLoadBitmapQrFailed();
+            } else {
+                qrBitmapLoadListener.onLoadBitmapQrSuccess(result);
+            }
+        }
     }
 }
