@@ -30,38 +30,29 @@ allprojects { repositories {
 3- in your build.gradle file in app level in dependencies{} add :- implementation 'com.github.payskyCompany:fabsdk:1.1.10'
 Example:-
 dependencies {
-  implementation 'com.github.payskyCompany:paybutton:1.1.12'
+  implementation 'com.github.payskyCompany:paybutton:1.1.16'
 }
 4- Sync your project.
 
-Note:- 1.1.9 may not be the last version check Releases in github to get latest version.
+Note:- 1.1.16 may not be the last version check Releases in github to get latest version.
 ```
 ### Using SDK
 
 ```
 in order to use our SDK you should get merchant id and Terminal id from our company.
 
-1 – Attach to your design xml file our Button.
-
-  <io.paysky.ui.custom.PayButton
-                android:id="@+id/paybtn"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:gravity="center" />
-
-2 - if you don't have a xml view layour file you can add our PayButton in your java code.
-
-  PayButton payButton = new PayButton(context);
-
-3 - after inflate PayButton in xml find it in your java code like:-
-
-  PayButton payButton = findViewByI(R.id.paybtn);
+1 – create a new instance from PayButton:-  
+PayButton payButton = new PayButton(context);
 
 you need to just pass some parameters to our button to know merchant data and amount this parameters is:-
   1-Merchat id
   2-Terminal id
   3-Payment amount
   4-Currency code
+  5-merchant secure hash.
+  
+Note That:-
+you shoud keep your secure hash and merchant id and terminal id with encryption before save them in storage if you want.
 
 Example:-
 
@@ -69,44 +60,56 @@ payButton.setMerchantId(merchantId); // Merchant id
 payButton.setTerminalId(terminalId); // Terminal  id
 payButton.setPayAmount(amount); // Amount
 payButton.setCurrencyCode(currencyCode); // Currency Code
+payButton.setMerchantSecureHash("Merchant secure hash");
 
-4 - in order to create transaction call:-
+2 - in order to create transaction call:-
 
 payButton.createTransaction(new PayButton.PaymentTransactionCallback() {
+
                     @Override
-                    public void onSuccess(String referenceNumber,
-                     String responseCode, String authorizationCode) {
-                       // handle success transaction.
+                    public void onCardTransactionSuccess(SuccessfulCardTransaction cardTransaction) {
+                        paymentStatusTextView.setText(cardTransaction.toString());
+                    }
+
+                    @Override
+                    public void onWalletTransactionSuccess(SuccessfulWalletTransaction walletTransaction) {
+                        paymentStatusTextView.setText(walletTransaction.toString());
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                         // fail to create transacion and receive error.
+                        paymentStatusTextView.setText("failed by:- " + error.getMessage());
                     }
                 });
 
 to create transaction in our sdk you just call createTransaction method and pass to it
 PaymentTransactionCallback listener to call it after transaction.
 this listener has 2 methods:-
-  1 - onSuccess method
-      this method called in case transaction success and you will receive  referenceNumber,  responseCode,  authorizationCode
-      of transaction.
-  2 - onError method in case transaction failed with Throwable exception that has error info.
+  1 - onCardTransactionSuccess method
+      this method called in case transaction success by card payment with SuccessfulCardTransaction object.
+  2 - onWalletTransactionSuccess method 
+      this method is called if customer make a wallet transaction with SuccessfulWalletTransaction object.
+ 3- onError method in case transaction failed with Throwable exception that has error info.
+Example:- 
 
-Example:-
-
-payButton.createTransaction(new PayButton.PaymentTransactionCallback() {
+          payButton.createTransaction(new PayButton.PaymentTransactionCallback() {
                     @Override
-                    public void onSuccess(String referenceNumber, String responseCode,
-                                         String authorizationCode) {
-                       // handle success transaction.
+                    public void onCardTransactionSuccess(SuccessfulCardTransaction cardTransaction) {
+                        paymentStatusTextView.setText(cardTransaction.toString());
+                    }
+
+                    @Override
+                    public void onWalletTransactionSuccess(SuccessfulWalletTransaction walletTransaction) {
+                        paymentStatusTextView.setText(walletTransaction.toString());
                     }
 
                     @Override
                     public void onError(Throwable error) {
-                         // fail to create transacion and receive error.
+                        paymentStatusTextView.setText("failed by:- " + error.getMessage());
                     }
                 });
+            }
+        });
 
 ```
 ## Deployment
