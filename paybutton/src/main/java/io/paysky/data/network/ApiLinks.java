@@ -7,6 +7,7 @@ package io.paysky.data.network;
 public class ApiLinks {
 
     // note that https is 9006 port, http is 4006 port.
+    
     public static String MAIN_LINK = "http://197.50.37.116:4006/";
     public static final String EXECUTE_PAYMENT = "Cube/PayLink.svc/api/PayByCard";
     public static final String SEND_RECEIPT_BY_MAIL = "Cube/PayLink.svc/api/SendReceiptToEmail";
