@@ -42,6 +42,7 @@ dependencies {
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     compile 'com.android.support:multidex:1.0.3'
-    implementation project(':paybutton')
+    implementation 'com.github.payskyCompany:payButton:1.1.18'
+
 }
 tasks.withType(Javadoc).all { enabled = false }
