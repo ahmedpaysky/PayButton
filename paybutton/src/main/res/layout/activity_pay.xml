@@ -79,7 +79,7 @@
                         android:textStyle="bold" />
 
                     <TextView
-                        android:id="@+id/merchant_name_textView"
+                        android:id="@+id/pb_merchant_name_textView"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="4dp"

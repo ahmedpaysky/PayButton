@@ -47,23 +47,23 @@ public class ReceiptManager {
 
 
     private void initView(View receiptView) {
-        merchantNameTextView = receiptView.findViewById(R.id.merchant_name_textView);
-        receiptDate = receiptView.findViewById(R.id.receipt_date);
-        receiptTime = receiptView.findViewById(R.id.receipt_time);
-        receiptMid = receiptView.findViewById(R.id.receipt_mid);
-        receiptTid = receiptView.findViewById(R.id.receipt_tid);
-        receiptNumberTextView = receiptView.findViewById(R.id.receipt_number);
-        transactionTypeTextView = receiptView.findViewById(R.id.transaction_type_info);
-        cardNumber = receiptView.findViewById(R.id.card_number);
-        cardType = receiptView.findViewById(R.id.card_type);
-        cardHolderName = receiptView.findViewById(R.id.card_holder_name);
-        stan = receiptView.findViewById(R.id.stan);
-        rrn = receiptView.findViewById(R.id.rrn);
-        authNumber = receiptView.findViewById(R.id.auth_number);
-        total = receiptView.findViewById(R.id.total);
-        transactionPayType = receiptView.findViewById(R.id.transaction_pay_type);
-        receiptPrintTo = receiptView.findViewById(R.id.receipt_print_to);
-        signLayout = receiptView.findViewById(R.id.sign_layout);
+        merchantNameTextView = receiptView.findViewById(R.id.pb_merchant_name_textView);
+        receiptDate = receiptView.findViewById(R.id.pb_receipt_date);
+        receiptTime = receiptView.findViewById(R.id.pb_receipt_time);
+        receiptMid = receiptView.findViewById(R.id.pb_receipt_mid);
+        receiptTid = receiptView.findViewById(R.id.pb_receipt_tid);
+        receiptNumberTextView = receiptView.findViewById(R.id.pb_receipt_number);
+        transactionTypeTextView = receiptView.findViewById(R.id.pb_transaction_type_info);
+        cardNumber = receiptView.findViewById(R.id.pb_card_number);
+        cardType = receiptView.findViewById(R.id.pb_card_type);
+        cardHolderName = receiptView.findViewById(R.id.pb_card_holder_name);
+        stan = receiptView.findViewById(R.id.pb_stan);
+        rrn = receiptView.findViewById(R.id.pb_rrn);
+        authNumber = receiptView.findViewById(R.id.pb_auth_number);
+        total = receiptView.findViewById(R.id.pb_total);
+        transactionPayType = receiptView.findViewById(R.id.pb_transaction_pay_type);
+        receiptPrintTo = receiptView.findViewById(R.id.pb_receipt_print_to);
+        signLayout = receiptView.findViewById(R.id.pb_sign_layout);
      /*   AppUtils.applyFont("receipt_font.ttf", merchantNameTextView, receiptDate, receiptTime,
                 receiptMid, receiptTid, receiptNumberTextView, transactionTypeTextView, cardNumber,
                  cardType, cardHolderName, stan, rrn, authNumber

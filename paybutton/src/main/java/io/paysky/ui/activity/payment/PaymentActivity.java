@@ -82,7 +82,7 @@ public class PaymentActivity extends BaseActivity implements PayActivityView, Pa
     private void initView() {
         headerBackImage = findViewById(R.id.header_back_imageView);
         headerBackImage.setOnClickListener(this);
-        merchantNameTextView = findViewById(R.id.merchant_name_textView);
+        merchantNameTextView = findViewById(R.id.pb_merchant_name_textView);
         currencyTextView = findViewById(R.id.currency_textView);
         amountTextView = findViewById(R.id.amount_textView);
         TextView languageTextView = findViewById(R.id.language_textView);
