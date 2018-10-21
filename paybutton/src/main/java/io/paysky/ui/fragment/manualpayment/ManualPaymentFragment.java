@@ -246,7 +246,7 @@ public class ManualPaymentFragment extends BaseFragment implements ManualPayment
 
     @Override
     public void showPaymentFailedFragment(Bundle bundle) {
-        activity.replaceFragmentAndAddOldToBackStack(PaymentFailedFragment.class, bundle);
+        activity.replaceFragmentAndRemoveOldFragment(PaymentFailedFragment.class, bundle);
     }
 
     @Override

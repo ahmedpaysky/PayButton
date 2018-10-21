@@ -20,8 +20,8 @@ import io.paysky.util.PaymentObserver;
 public class PayButton implements PaymentObserver {
 
     //Variables.
-    private long merchantId = 0;
-    private long terminalId = 0;
+    private String merchantId = null;
+    private String terminalId = null;
     private double amount = 0.0;
     private int currencyCode = 0;
     private String merchantSecureHash;
@@ -35,16 +35,16 @@ public class PayButton implements PaymentObserver {
     }
 
 
-    public void setMerchantId(long merchantId) {
-        if (merchantId <= 0) {
+    public void setMerchantId(String merchantId) {
+        if (merchantId == null) {
             throw new IllegalArgumentException("invalid merchant id");
         }
         this.merchantId = merchantId;
     }
 
 
-    public void setTerminalId(long terminalId) {
-        if (terminalId <= 0) {
+    public void setTerminalId(String terminalId) {
+        if (terminalId == null) {
             throw new IllegalArgumentException("invalid terminal id");
         }
         this.terminalId = terminalId;
@@ -91,21 +91,21 @@ public class PayButton implements PaymentObserver {
     }
 
     private void validateUserInputs() {
-        if (merchantId == 0 || terminalId == 0 || amount == 0 || merchantSecureHash == null || merchantSecureHash.isEmpty()) {
+        if (merchantId == null || terminalId == null || amount == 0 || merchantSecureHash == null || merchantSecureHash.isEmpty()) {
             throw new IllegalStateException("add all required fields to create transaction");
         }
     }
 
     @Override
     public void sendPaymentStatus(PaymentStatusEvent paymentStatusEvent) {
-        if (paymentStatusEvent.failException == null) {
+        if (paymentStatusEvent.failException != null) {
+            transactionCallback.onError(paymentStatusEvent.failException);
+        } else {
             if (paymentStatusEvent.cardTransaction != null) {
                 transactionCallback.onCardTransactionSuccess(paymentStatusEvent.cardTransaction);
             } else {
                 transactionCallback.onWalletTransactionSuccess(paymentStatusEvent.walletTransaction);
             }
-        } else {
-            transactionCallback.onError(paymentStatusEvent.failException);
         }
     }
 

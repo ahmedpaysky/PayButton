@@ -218,17 +218,17 @@ public class PaymentActivity extends BaseActivity implements PayActivityView, Pa
             TextView manualTextView = cardPaymentLayout.findViewById(R.id.card_payment_textView);
             manualTextView.setTextColor(getResources().getColor(android.R.color.white));
             if (LocaleHelper.getLocale(this).equals("ar")) {
-                manualTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_card_white, 0);
+                manualTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_card_white,0, 0, 0);
             } else {
-                manualTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_card_white, 0, 0, 0);
+                manualTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0,R.drawable.ic_card_white, 0);
             }
             qrPaymentLayout.setBackgroundResource(R.drawable.payment_option_unselected);
             TextView qrTextView = qrPaymentLayout.findViewById(R.id.qr_payment_textView);
             qrTextView.setTextColor(getResources().getColor(R.color.font_gray_color3));
             if (LocaleHelper.getLocale(this).equals("ar")) {
-                qrTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_wallet_gray, 0);
+                qrTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_wallet_gray,0, 0, 0);
             } else {
-                qrTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_wallet_gray, 0, 0, 0);
+                qrTextView.setCompoundDrawablesWithIntrinsicBounds( 0, 0,R.drawable.ic_wallet_gray, 0);
             }
         } else {
             // qr payment.
@@ -236,17 +236,17 @@ public class PaymentActivity extends BaseActivity implements PayActivityView, Pa
             TextView manualTextView = cardPaymentLayout.findViewById(R.id.card_payment_textView);
             manualTextView.setTextColor(getResources().getColor(R.color.font_gray_color3));
             if (LocaleHelper.getLocale(this).equals("ar")) {
-                manualTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_card_black, 0);
+                manualTextView.setCompoundDrawablesWithIntrinsicBounds( R.drawable.ic_card_black, 0,0, 0);
             } else {
-                manualTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_card_black, 0, 0, 0);
+                manualTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_card_black, 0);
             }
             qrPaymentLayout.setBackgroundResource(R.drawable.payment_option_selected);
             TextView qrTextView = qrPaymentLayout.findViewById(R.id.qr_payment_textView);
             qrTextView.setTextColor(getResources().getColor(android.R.color.white));
             if (LocaleHelper.getLocale(this).equals("ar")) {
-                qrTextView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_wallet_white, 0);
+                qrTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_wallet_white,0, 0, 0);
             } else {
-                qrTextView.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_wallet_white, 0, 0, 0);
+                qrTextView.setCompoundDrawablesWithIntrinsicBounds( 0, 0,R.drawable.ic_wallet_white, 0);
             }
         }
     }
@@ -265,7 +265,6 @@ public class PaymentActivity extends BaseActivity implements PayActivityView, Pa
         } else {
             paymentStatusEvent.cardTransaction = cardTransaction;
             paymentStatusEvent.walletTransaction = walletTransaction;
-            paymentStatusEvent.failException = failTransactionException;
         }
 
         PaymentObservable.sendPaymentStatus(paymentStatusEvent);
@@ -298,4 +297,7 @@ public class PaymentActivity extends BaseActivity implements PayActivityView, Pa
         failTransactionException = error;
     }
 
+    public void showManualPayment() {
+        cardPaymentLayout.performClick();
+    }
 }

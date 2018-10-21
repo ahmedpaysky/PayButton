@@ -136,6 +136,7 @@ public class WebPaymentFragment extends BaseFragment implements WebPaymentView {
         {
             @Override
             public void onSuccess(ManualPaymentResponse response) {
+                if (isDetached())return;
                 // server make response.
                 dismissProgress();
                 PaymentTransactionListener transaction = ((PaymentTransactionListener) getActivity());
@@ -143,13 +144,14 @@ public class WebPaymentFragment extends BaseFragment implements WebPaymentView {
                     transaction.setFailTransactionError(new Exception(response.mWMessage));
                     Bundle bundle = new Bundle();
                     bundle.putString("decline_cause", response.mWMessage);
+                    bundle.putString("opened_by","manual_payment");
                     activity.replaceFragmentAndAddOldToBackStack(PaymentFailedFragment.class, bundle);
                 } else {
                     if (response.actionCode == null || response.actionCode.isEmpty() || !response.actionCode.equals("00")) {
                         transaction.setFailTransactionError(new Exception(response.message));
                         Bundle bundle = new Bundle();
                         bundle.putString("decline_cause", response.message);
-                        activity.replaceFragmentAndAddOldToBackStack(PaymentFailedFragment.class, bundle);
+                        activity.replaceFragmentAndRemoveOldFragment(PaymentFailedFragment.class, bundle);
                     } else {
                         // transaction success.
                         SuccessfulCardTransaction cardTransaction = new SuccessfulCardTransaction();
@@ -172,6 +174,7 @@ public class WebPaymentFragment extends BaseFragment implements WebPaymentView {
             @Override
             public void onFail(Throwable error) {
                 // payment failed.
+                if (isDetached())return;
                 dismissProgress();
                 activity.setFailTransactionError(error);
                 error.printStackTrace();
@@ -201,7 +204,7 @@ public class WebPaymentFragment extends BaseFragment implements WebPaymentView {
         transactionData.transactionType = ReceiptData.TransactionType.SALE.name();
         transactionData.secureHashKey = paymentData.secureHashKey;
         bundle.putParcelable(AppConstant.BundleKeys.RECEIPT, transactionData);
-        activity.replaceFragmentAndAddOldToBackStack(PaymentApprovedFragment.class, bundle);
+        activity.replaceFragmentAndRemoveOldFragment(PaymentApprovedFragment.class, bundle);
     }
 
 

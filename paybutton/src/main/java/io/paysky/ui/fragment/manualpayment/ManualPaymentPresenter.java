@@ -137,12 +137,14 @@ class ManualPaymentPresenter extends BasePresenter<ManualPaymentView> {
                     view.setFailTransactionError(new Exception(response.mWMessage));
                     Bundle bundle = new Bundle();
                     bundle.putString("decline_cause", response.mWMessage);
+                    bundle.putString("opened_by","manual_payment");
                     view.showPaymentFailedFragment(bundle);
                 } else {
                     if (response.actionCode == null || response.actionCode.isEmpty() || !response.actionCode.equals("00")) {
                         view.setFailTransactionError(new Exception(response.message));
                         Bundle bundle = new Bundle();
                         bundle.putString("decline_cause", response.message);
+                        bundle.putString("opened_by","manual_payment");
                         view.showPaymentFailedFragment(bundle);
                     } else {
                         // transaction success.

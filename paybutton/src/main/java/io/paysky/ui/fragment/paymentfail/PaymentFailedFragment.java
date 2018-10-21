@@ -23,11 +23,6 @@ public class PaymentFailedFragment extends BaseFragment implements View.OnClickL
 
     //Objects,
     private PaymentActivity activity;
-    //GUI.
-    private Button closeButton;
-    private Button tryAgainButton;
-    private TextView transactionDeclinedTextView;
-    private TextView declineCauseTextView;
     //Variables.
     private String declineCause;
 
@@ -67,22 +62,23 @@ public class PaymentFailedFragment extends BaseFragment implements View.OnClickL
     }
 
     private void initView(View view) {
-        closeButton = view.findViewById(R.id.close_button);
+        Button closeButton = view.findViewById(R.id.close_button);
         closeButton.setOnClickListener(this);
-        tryAgainButton = view.findViewById(R.id.try_again_button);
+        Button tryAgainButton = view.findViewById(R.id.try_again_button);
         tryAgainButton.setOnClickListener(this);
-        transactionDeclinedTextView = view.findViewById(R.id.transaction_declined_textView);
-        declineCauseTextView = view.findViewById(R.id.declined_cause_textView);
+        TextView transactionDeclinedTextView = view.findViewById(R.id.transaction_declined_textView);
+        TextView declineCauseTextView = view.findViewById(R.id.declined_cause_textView);
         AppUtils.showHtmlText(transactionDeclinedTextView, R.string.transaction_declined);
         declineCauseTextView.setText(declineCause);
     }
 
     @Override
     public void onClick(View view) {
-        if (view.getId() == R.id.close_button) {
+        int viewId = view.getId();
+        if (viewId == R.id.close_button) {
             activity.onBackPressed();
-        } else {
-            activity.onBackPressed();
+        } else if(viewId==R.id.try_again_button) {
+            activity.showManualPayment();
         }
     }
 }

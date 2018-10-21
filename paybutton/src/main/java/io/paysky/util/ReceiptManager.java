@@ -22,8 +22,8 @@ public class ReceiptManager {
     private TextView receiptTime;
     private TextView receiptMid;
     private TextView receiptTid;
-    private TextView receiptNumber;
-    private TextView transactionType;
+    private TextView receiptNumberTextView;
+    private TextView transactionTypeTextView;
     private TextView cardNumber;
     private TextView cardType;
     private TextView cardHolderName;
@@ -33,7 +33,6 @@ public class ReceiptManager {
     private TextView total;
     private TextView transactionPayType;
     private LinearLayout signLayout;
-    private TextView sign;
     private TextView receiptPrintTo;
     //Objects
     private ReceiptData receiptData;
@@ -53,8 +52,8 @@ public class ReceiptManager {
         receiptTime = receiptView.findViewById(R.id.receipt_time);
         receiptMid = receiptView.findViewById(R.id.receipt_mid);
         receiptTid = receiptView.findViewById(R.id.receipt_tid);
-        receiptNumber = receiptView.findViewById(R.id.receipt_number);
-        transactionType = receiptView.findViewById(R.id.transaction_type);
+        receiptNumberTextView = receiptView.findViewById(R.id.receipt_number);
+        transactionTypeTextView = receiptView.findViewById(R.id.transaction_type_info);
         cardNumber = receiptView.findViewById(R.id.card_number);
         cardType = receiptView.findViewById(R.id.card_type);
         cardHolderName = receiptView.findViewById(R.id.card_holder_name);
@@ -63,11 +62,10 @@ public class ReceiptManager {
         authNumber = receiptView.findViewById(R.id.auth_number);
         total = receiptView.findViewById(R.id.total);
         transactionPayType = receiptView.findViewById(R.id.transaction_pay_type);
-        sign = receiptView.findViewById(R.id.sign);
         receiptPrintTo = receiptView.findViewById(R.id.receipt_print_to);
         signLayout = receiptView.findViewById(R.id.sign_layout);
      /*   AppUtils.applyFont("receipt_font.ttf", merchantNameTextView, receiptDate, receiptTime,
-                receiptMid, receiptTid, receiptNumber, transactionType, cardNumber,
+                receiptMid, receiptTid, receiptNumberTextView, transactionTypeTextView, cardNumber,
                  cardType, cardHolderName, stan, rrn, authNumber
                 , total, transactionPayType, receiptPrintTo
         );*/
@@ -95,8 +93,8 @@ public class ReceiptManager {
         receiptTime.setText(String.format("Time: %d:%d:%d", today.hour, today.minute, today.second));
         receiptMid.setText("MID: " + receiptData.merchantId);
         receiptTid.setText("TID: " + receiptData.terminalId);
-        receiptNumber.setText("Receipt #: " + receiptData.receiptNumber);
-        transactionType.setText(receiptData.transactionType);
+        receiptNumberTextView.setText("Receipt #: " + receiptData.receiptNumber);
+        transactionTypeTextView.setText(receiptData.transactionType);
         cardHolderName.setText(receiptData.cardHolderName);
         String card = receiptData.cardNumber;
         if (receiptData.channelName.equals(AppConstant.TransactionChannelName.TAHWEEL)) {
