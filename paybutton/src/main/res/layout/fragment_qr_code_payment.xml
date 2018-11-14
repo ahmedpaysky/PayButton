@@ -21,8 +21,8 @@
 
         <ImageView
             android:id="@+id/qr_imageView"
-            android:layout_width="@dimen/_180sdp"
-            android:layout_height="@dimen/_170sdp"
+            android:layout_width="@dimen/_190sdp"
+            android:layout_height="@dimen/_190sdp"
             android:layout_gravity="center"
             android:scaleType="fitXY" />
 
@@ -49,7 +49,7 @@
                 android:layout_marginTop="@dimen/_2sdp">
 
                 <View
-                    android:layout_width="@dimen/_12sdp"
+                    android:layout_width="@dimen/_8sdp"
                     android:layout_height="match_parent"
                     android:background="@color/accentColor" />
 
@@ -66,10 +66,10 @@
             <Button
                 android:id="@+id/send_otp_button"
                 style="@style/buttonStyle"
-                android:layout_height="@dimen/_36sdp"
+                android:layout_height="@dimen/_34sdp"
                 android:layout_marginEnd="@dimen/_12sdp"
                 android:layout_marginStart="@dimen/_12sdp"
-                android:layout_marginTop="@dimen/_4sdp"
+                android:layout_marginTop="@dimen/_8sdp"
                 android:background="@drawable/baybutton_proceed_button"
                 android:text="@string/send_otp" />
         </LinearLayout>
@@ -143,7 +143,6 @@
             </LinearLayout>
 
         </LinearLayout>
-
 
     </LinearLayout>
 </ScrollView>

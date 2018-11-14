@@ -59,6 +59,7 @@ public class PaymentFailedFragment extends BaseFragment implements View.OnClickL
             }
         });
         initView(view);
+
     }
 
     private void initView(View view) {

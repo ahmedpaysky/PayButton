@@ -1,6 +1,7 @@
 package io.paysky.ui.base;
 
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.DrawableRes;
 import android.support.annotation.StringRes;
@@ -17,6 +18,8 @@ import io.paysky.ui.dialog.InfoDialog;
 import io.paysky.ui.mvp.BaseView;
 import io.paysky.util.AppUtils;
 import io.paysky.util.ToastUtils;
+import uk.co.chrisjenx.calligraphy.CalligraphyConfig;
+import uk.co.chrisjenx.calligraphy.CalligraphyContextWrapper;
 
 /**
  * Created by Paysky-202 on 5/13/2018.
@@ -26,6 +29,16 @@ public class BaseActivity extends AppCompatActivity implements BaseView {
 
     private ProgressDialog progressDialog;
 
+
+    @Override
+    protected void attachBaseContext(Context newBase) {
+        CalligraphyConfig.initDefault(new CalligraphyConfig.Builder()
+                .setDefaultFontPath("medium.ttf")
+                .setFontAttrId(R.attr.fontPath)
+                .build());
+
+        super.attachBaseContext(CalligraphyContextWrapper.wrap(newBase));
+    }
 
     @Override
     public void showProgress() {

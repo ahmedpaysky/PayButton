@@ -22,6 +22,7 @@ import io.paysky.util.AppUtils;
 import io.paysky.util.DialogUtils;
 import io.paysky.util.PrintReceiptListener;
 import io.paysky.util.ReceiptManager;
+import io.paysky.util.ToastUtils;
 
 
 public class PaymentApprovedFragment extends BaseFragment implements View.OnClickListener, PrintReceiptListener, PaymentApprovedView {
@@ -186,8 +187,8 @@ public class PaymentApprovedFragment extends BaseFragment implements View.OnClic
     }
 
     @Override
-    public void showErrorDialog(int error) {
-        DialogUtils.showInfoDialog(activity ,getString(error));
+    public void showErrorToast(int error) {
+        ToastUtils.showLongToast(activity,getString(error));
     }
 
     @Override

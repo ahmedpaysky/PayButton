@@ -10,6 +10,10 @@ public class SuccessfulWalletTransaction {
     public String MerchantReference;
     public String Payer;
     public String PayerName;
+    public String merchantId;
+    public String terminalId;
+    public String amount;
+    public String TxnDate;
 
     @Override
     public String toString() {
@@ -22,11 +26,10 @@ public class SuccessfulWalletTransaction {
                 ", MerchantReference='" + MerchantReference + '\'' +
                 ", Payer='" + Payer + '\'' +
                 ", PayerName='" + PayerName + '\'' +
+                ", merchantId='" + merchantId + '\'' +
+                ", terminalId='" + terminalId + '\'' +
+                ", amount='" + amount + '\'' +
                 ", TxnDate='" + TxnDate + '\'' +
-                ", AmountTrxn='" + AmountTrxn + '\'' +
                 '}';
     }
-
-    public String TxnDate;
-    public String AmountTrxn;
 }

@@ -22,7 +22,6 @@ import io.card.payment.CardIOActivity;
 import io.card.payment.CreditCard;
 import io.paysky.data.model.PaymentData;
 import io.paysky.data.model.ReceiptData;
-import io.paysky.data.model.SuccessfulCardTransaction;
 import io.paysky.ui.base.BaseFragment;
 import io.paysky.ui.custom.CardEditText;
 import io.paysky.ui.dialog.InfoDialog;
@@ -31,6 +30,8 @@ import io.paysky.ui.fragment.paymentsuccess.PaymentApprovedFragment;
 import io.paysky.ui.fragment.webview.WebPaymentFragment;
 import io.paysky.util.AppConstant;
 import io.paysky.util.AppUtils;
+import io.paysky.util.LocaleHelper;
+import io.paysky.util.ToastUtils;
 
 
 public class ManualPaymentFragment extends BaseFragment implements ManualPaymentView, View.OnClickListener {
@@ -59,7 +60,6 @@ public class ManualPaymentFragment extends BaseFragment implements ManualPayment
         super.onCreate(savedInstanceState);
         // get data from bundle.
         presenter = new ManualPaymentPresenter(getArguments());
-        presenter.attachView(this);
     }
 
     @Override
@@ -72,6 +72,7 @@ public class ManualPaymentFragment extends BaseFragment implements ManualPayment
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        presenter.attachView(this);
         initView(view);
     }
 
@@ -92,7 +93,7 @@ public class ManualPaymentFragment extends BaseFragment implements ManualPayment
         ccvEditText = view.findViewById(R.id.ccv_editText);
         proceedButton = view.findViewById(R.id.proceed_button);
         proceedButton.setOnClickListener(this);
-        if (isAppLanguageAr()) {
+        if (LocaleHelper.getLocale().equals("ar")) {
             cardNumberEditText.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
             expireDateEditText.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
             ccvEditText.setTextAlignment(View.TEXT_ALIGNMENT_VIEW_START);
@@ -136,12 +137,13 @@ public class ManualPaymentFragment extends BaseFragment implements ManualPayment
         scanIntent.putExtra(CardIOActivity.EXTRA_SUPPRESS_MANUAL_ENTRY, true);
         // MY_SCAN_REQUEST_CODE is arbitrary and is only used within this activity.
         startActivityForResult(scanIntent, 1005);
+        ToastUtils.showLongToast(getActivity(), getString(R.string.allow_light_scan));
     }
 
 
     private boolean isInputsValid(String cardNumber, String ownerName, String expireDate, String ccv) {
         boolean isValidInputs = true;
-        if (isEmpty(cardNumber) || cardNumber.length() < 16) {
+        if (!cardNumberEditText.isValid()) {
             isValidInputs = false;
             cardNumberEditText.setError(getString(R.string.invalid_card_number_length));
         }
@@ -150,6 +152,7 @@ public class ManualPaymentFragment extends BaseFragment implements ManualPayment
             isValidInputs = false;
             cardOwnerNameEditText.setError(getString(R.string.enter_valid_owner));
         }
+
         if (isEmpty(expireDate) || expireDate.length() < 4) {
             isValidInputs = false;
             expireDateEditText.setError(getString(R.string.invalid_expire_date));
@@ -180,6 +183,12 @@ public class ManualPaymentFragment extends BaseFragment implements ManualPayment
             isValidInputs = false;
             ccvEditText.setError(getString(R.string.invalid_ccv));
         }
+
+        if (ccv.equals("000")) {
+            isValidInputs = false;
+            ccvEditText.setError(getString(R.string.invalid_ccv_value));
+        }
+
         return isValidInputs;
     }
 
@@ -207,8 +216,7 @@ public class ManualPaymentFragment extends BaseFragment implements ManualPayment
 
     @Override
     public void showTransactionApprovedFragment(String transactionNumber, String approvalCode,
-                                                String retrievalRefNr, String cardHolderName, String cardNumber, String systemTraceNumber, PaymentData paymentData
-    ) {
+                                                String retrievalRefNr, String cardHolderName, String cardNumber, String systemTraceNumber, PaymentData paymentData) {
         Bundle bundle = new Bundle();
         ReceiptData receiptData = new ReceiptData();
         receiptData.rrn = transactionNumber;
@@ -228,20 +236,13 @@ public class ManualPaymentFragment extends BaseFragment implements ManualPayment
         receiptData.secureHashKey = paymentData.secureHashKey;
         bundle.putParcelable(AppConstant.BundleKeys.RECEIPT, receiptData);
         activity.replaceFragmentAndRemoveOldFragment(PaymentApprovedFragment.class, bundle);
+        activity.hidePaymentOptions();
     }
 
 
     @Override
-    public void showErrorInServerDialog() {
-        InfoDialog infoDialog = new InfoDialog(activity);
-        infoDialog.setTitle(R.string.error);
-        infoDialog.setDialogText(R.string.error_try_again);
-        infoDialog.showAgreeButton(R.string.ok, null).showDialog();
-    }
-
-    @Override
-    public void setFailTransactionError(Throwable exception) {
-        activity.setFailTransactionError(exception);
+    public void showErrorInServerToast() {
+        ToastUtils.showLongToast(activity, getString(R.string.error_try_again));
     }
 
     @Override
@@ -249,10 +250,6 @@ public class ManualPaymentFragment extends BaseFragment implements ManualPayment
         activity.replaceFragmentAndRemoveOldFragment(PaymentFailedFragment.class, bundle);
     }
 
-    @Override
-    public void successCardTransaction(SuccessfulCardTransaction cardTransaction) {
-        activity.successCardTransaction(cardTransaction);
-    }
 
     public void show3dpWebView(String webBody, String url, int gatewayType, PaymentData paymentData) {
         Bundle bundle = new Bundle();
@@ -264,5 +261,11 @@ public class ManualPaymentFragment extends BaseFragment implements ManualPayment
         bundle.putString("cvv", ccv);
         bundle.putParcelable(AppConstant.BundleKeys.PAYMENT_DATA, paymentData);
         activity.replaceFragmentAndRemoveOldFragment(WebPaymentFragment.class, bundle);
+    }
+
+    @Override
+    public void onDestroyView() {
+        presenter.detachView();
+        super.onDestroyView();
     }
 }

@@ -1,23 +1,30 @@
 package io.paysky.data.network;
 
+import com.example.paybutton.BuildConfig;
+
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import io.paysky.data.model.request.CheckTransactionStatusRequest;
+import io.paysky.data.model.request.Compose3dsTransactionRequest;
 import io.paysky.data.model.request.ManualPaymentRequest;
+import io.paysky.data.model.request.MerchantInfoRequest;
 import io.paysky.data.model.request.Process3dTransactionRequest;
 import io.paysky.data.model.request.QrGeneratorRequest;
+import io.paysky.data.model.request.RequestToPayRequest;
 import io.paysky.data.model.request.SendReceiptByMailRequest;
-import io.paysky.data.model.request.SmsPaymentRequest;
 import io.paysky.data.model.request.TransactionStatusRequest;
-import io.paysky.data.model.request.Compose3dsTransactionRequest;
+import io.paysky.data.model.response.CheckTransactionStatusResponse;
+import io.paysky.data.model.response.Compose3dsTransactionResponse;
+import io.paysky.data.model.response.DateTransactionsItem;
 import io.paysky.data.model.response.GenerateQrCodeResponse;
 import io.paysky.data.model.response.ManualPaymentResponse;
 import io.paysky.data.model.response.MerchantInfoResponse;
 import io.paysky.data.model.response.Process3dTransactionResponse;
+import io.paysky.data.model.response.RequestToPayResponse;
 import io.paysky.data.model.response.SendReceiptByMailResponse;
-import io.paysky.data.model.response.SmsPaymentResponse;
 import io.paysky.data.model.response.TransactionStatusResponse;
-import io.paysky.data.model.request.MerchantInfoRequest;
-import io.paysky.data.model.response.Compose3dsTransactionResponse;
+import io.paysky.data.model.response.TransactionsItem;
 import okhttp3.OkHttpClient;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Call;
@@ -110,16 +117,16 @@ public class ApiConnection {
     }
 
 
-    public static void requestToPay(SmsPaymentRequest smsPaymentRequest, final ApiResponseListener<SmsPaymentResponse> listener) {
-        createConnection().requestToPay(smsPaymentRequest)
-                .enqueue(new Callback<SmsPaymentResponse>() {
+    public static void requestToPay(RequestToPayRequest requestToPayRequest, final ApiResponseListener<RequestToPayResponse> listener) {
+        createConnection().requestToPay(requestToPayRequest)
+                .enqueue(new Callback<RequestToPayResponse>() {
                     @Override
-                    public void onResponse(Call<SmsPaymentResponse> call, Response<SmsPaymentResponse> response) {
+                    public void onResponse(Call<RequestToPayResponse> call, Response<RequestToPayResponse> response) {
                         listener.onSuccess(response.body());
                     }
 
                     @Override
-                    public void onFailure(Call<SmsPaymentResponse> call, Throwable t) {
+                    public void onFailure(Call<RequestToPayResponse> call, Throwable t) {
                         listener.onFail(t);
                     }
                 });
@@ -128,11 +135,15 @@ public class ApiConnection {
 
     private static ApiInterface createConnection() {
         HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-        interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        if (BuildConfig.DEBUG) {
+            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+        } else {
+            interceptor.setLevel(HttpLoggingInterceptor.Level.NONE);
+        }
         OkHttpClient client = new OkHttpClient.Builder().addInterceptor(interceptor)
-                .connectTimeout(50, TimeUnit.SECONDS)
-                .writeTimeout(60, TimeUnit.SECONDS)
-                .readTimeout(60, TimeUnit.SECONDS).build();
+                .connectTimeout(40, TimeUnit.SECONDS)
+                .writeTimeout(40, TimeUnit.SECONDS)
+                .readTimeout(40, TimeUnit.SECONDS).build();
 
         return new Retrofit.Builder()
                 .baseUrl(ApiLinks.GRAY_LINK)
@@ -184,6 +195,39 @@ public class ApiConnection {
                 listener.onFail(t);
             }
         });
+    }
+
+
+    public static void checkTransactionStatus(final String transactionId, final CheckTransactionStatusRequest request, final CheckTransactionListener listener) {
+        createConnection().checkTransaction(request)
+                .enqueue(new Callback<CheckTransactionStatusResponse>() {
+                    @Override
+                    public void onResponse(Call<CheckTransactionStatusResponse> call, Response<CheckTransactionStatusResponse> response) {
+                        CheckTransactionStatusResponse body = response.body();
+                        if (body != null && body.success) {
+                            boolean transactionSuccess = false;
+                            List<TransactionsItem> transactions = body.transactions;
+                            for (TransactionsItem item : transactions) {
+                                for (DateTransactionsItem transactionsItem : item.dateTransactions) {
+                                    if (transactionsItem.merchantReference.equals(transactionId)) {
+                                        transactionSuccess = true;
+                                        listener.transactionSuccess(transactionsItem);
+                                    }
+                                }
+                            }
+                            if (!transactionSuccess) {
+                                listener.transactionFailed();
+                            }
+                        } else {
+                            listener.onError(new Exception("error in server"));
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Call<CheckTransactionStatusResponse> call, Throwable t) {
+                        listener.onError(t);
+                    }
+                });
     }
 
 }

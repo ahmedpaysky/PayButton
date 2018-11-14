@@ -1,13 +1,11 @@
 package io.paysky.ui.fragment.qr;
 
 
-import android.app.ProgressDialog;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.support.annotation.StringRes;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,13 +22,12 @@ import io.paysky.data.model.SuccessfulWalletTransaction;
 import io.paysky.data.model.response.TransactionStatusResponse;
 import io.paysky.ui.activity.payment.PaymentActivity;
 import io.paysky.ui.base.BaseFragment;
-import io.paysky.ui.base.PaymentTransactionListener;
 import io.paysky.ui.fragment.paymentsuccess.PaymentApprovedFragment;
 import io.paysky.util.AppConstant;
 import io.paysky.util.AppUtils;
-import io.paysky.util.ConvertQrCodToBitmapTask;
 import io.paysky.util.DialogUtils;
 import io.paysky.util.ToastUtils;
+import io.paysky.util.TransactionManager;
 
 
 public class QrCodePaymentFragment extends BaseFragment implements QrView, View.OnClickListener {
@@ -60,7 +57,6 @@ public class QrCodePaymentFragment extends BaseFragment implements QrView, View.
         super.onCreate(savedInstanceState);
         activity = (PaymentActivity) getActivity();
         presenter = new QrPresenter(getArguments());
-        presenter.attachView(this);
     }
 
 
@@ -74,6 +70,7 @@ public class QrCodePaymentFragment extends BaseFragment implements QrView, View.
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        presenter.attachView(this);
         initView(view);
         activity.setHeaderIcon(R.drawable.ic_close);
         activity.setHeaderIconClickListener(new View.OnClickListener() {
@@ -151,7 +148,6 @@ public class QrCodePaymentFragment extends BaseFragment implements QrView, View.
         checkTransactionHandler.removeCallbacks(checkPaymentRunnable);
         // response to caller.
         SuccessfulWalletTransaction walletTransaction = new SuccessfulWalletTransaction();
-        walletTransaction.AmountTrxn = response.amountTrxn + "";
         walletTransaction.IsPaid = response.isPaid;
         walletTransaction.MerchantReference = response.merchantReference;
         walletTransaction.Message = response.message;
@@ -161,8 +157,10 @@ public class QrCodePaymentFragment extends BaseFragment implements QrView, View.
         walletTransaction.Success = response.success;
         walletTransaction.SystemReference = response.systemReference + "";
         walletTransaction.TxnDate = response.txnDate;
-        PaymentTransactionListener transactionListener = ((PaymentTransactionListener) getActivity());
-        transactionListener.successWalletTransaction(walletTransaction);
+        walletTransaction.merchantId = paymentData.merchantId;
+        walletTransaction.terminalId = paymentData.terminalId;
+        walletTransaction.amount = paymentData.executedTransactionAmount;
+        TransactionManager.setWalletTransaction(walletTransaction);
         // show payment approved
         Bundle bundle = new Bundle();
         ReceiptData receiptData = new ReceiptData();
@@ -176,6 +174,7 @@ public class QrCodePaymentFragment extends BaseFragment implements QrView, View.
         receiptData.merchantName = paymentData.merchantName;
         receiptData.secureHashKey = paymentData.secureHashKey;
         bundle.putParcelable(AppConstant.BundleKeys.RECEIPT, receiptData);
+        activity.hidePaymentOptions();
         activity.replaceFragmentAndAddOldToBackStack(PaymentApprovedFragment.class, bundle);
     }
 
@@ -185,18 +184,25 @@ public class QrCodePaymentFragment extends BaseFragment implements QrView, View.
 
 
     @Override
-    public void showInfoDialog(String message) {
-        DialogUtils.showInfoDialog(activity, message);
+    public void showInfoToast(String message) {
+        ToastUtils.showLongToast(activity , message);
     }
 
     @Override
-    public void showErrorInServerDialog() {
-        DialogUtils.showInfoDialog(activity, getString(R.string.error_try_again));
+    public void showErrorInServerToast() {
+        ToastUtils.showLongToast(activity, getString(R.string.error_try_again));
     }
 
     @Override
     public void showQrImage(Bitmap bitmap) {
         qrImageView.setImageBitmap(bitmap);
+    }
+
+    @Override
+    public void disableR2pViews() {
+         mobileNumberEditText.setEnabled(false);
+         requestPaymentButton.setEnabled(false);
+        sendOtpButton.setEnabled(false);
     }
 
     @Override
@@ -206,4 +212,9 @@ public class QrCodePaymentFragment extends BaseFragment implements QrView, View.
         checkTransactionHandler.postDelayed(checkPaymentRunnable, 5000); // listen to payment approval.
     }
 
+    @Override
+    public void onDestroyView() {
+        presenter.detachView();
+        super.onDestroyView();
+    }
 }

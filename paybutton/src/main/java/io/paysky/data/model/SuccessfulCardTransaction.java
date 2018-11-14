@@ -11,6 +11,7 @@ public class SuccessfulCardTransaction {
     public String MerchantReference;
     public String Message;
     public boolean Success;
+    public String terminalId, merchantId, amount;
 
     @Override
     public String toString() {
@@ -23,6 +24,9 @@ public class SuccessfulCardTransaction {
                 ", MerchantReference='" + MerchantReference + '\'' +
                 ", Message='" + Message + '\'' +
                 ", Success=" + Success +
+                ", terminalId='" + terminalId + '\'' +
+                ", merchantId='" + merchantId + '\'' +
+                ", amount='" + amount + '\'' +
                 '}';
     }
 }

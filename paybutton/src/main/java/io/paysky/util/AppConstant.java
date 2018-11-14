@@ -11,7 +11,7 @@ public interface AppConstant {
         String PAYMENT_DATA = "payment_data";
         String RECEIPT = "receipt";
         String CURRENCY_CODE = "currency_code";
-        String IS3DS_ENABLED = "is_3ds_enabled";
+        String TRANSACTION_REFERENCE_NUMBER = "transaction_reference_number";
     }
 
 

@@ -6,7 +6,6 @@ import io.paysky.data.model.request.SendReceiptByMailRequest;
 import io.paysky.data.model.response.SendReceiptByMailResponse;
 import io.paysky.data.network.ApiConnection;
 import io.paysky.data.network.ApiResponseListener;
-import io.paysky.ui.dialog.InfoDialog;
 import io.paysky.ui.mvp.BasePresenter;
 import io.paysky.util.AppUtils;
 import io.paysky.util.HashGenerator;
@@ -41,7 +40,7 @@ class PaymentApprovedPresenter extends BasePresenter<PaymentApprovedView> {
                     view.setSendEmailSuccess(request.emailTo, operationType);
                 } else {
                     // show error dialog.
-                    view.showErrorDialog(R.string.cannot_send_mail);
+                    view.showErrorToast(R.string.cannot_send_mail);
                 }
             }
 
@@ -49,7 +48,7 @@ class PaymentApprovedPresenter extends BasePresenter<PaymentApprovedView> {
             public void onFail(Throwable error) {
                 error.printStackTrace();
                 view.dismissProgress();
-                view.showErrorDialog(R.string.cannot_send_mail);
+                view.showErrorToast(R.string.cannot_send_mail);
             }
         });
     }

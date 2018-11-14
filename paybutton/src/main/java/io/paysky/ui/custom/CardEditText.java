@@ -11,6 +11,7 @@ import android.widget.ImageView;
 
 import com.example.paybutton.R;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 
 
@@ -92,12 +93,28 @@ public class CardEditText extends AppCompatEditText implements TextWatcher {
     }
 
     public boolean isValid() {
-        if (getCardNumber().matches(CardPattern.VISA_VALID)) return true;
-        if (getCardNumber().matches(CardPattern.MASTERCARD_VALID)) return true;
-        if (getCardNumber().matches(CardPattern.AMERICAN_EXPRESS_VALID)) return true;
-        if (getCardNumber().matches(CardPattern.DISCOVER_VALID)) return true;
-        if (getCardNumber().matches(CardPattern.DINERS_CLUB_VALID)) return true;
-        if (getCardNumber().matches(CardPattern.JCB_VALID)) return true;
+/*        return getCardNumber().matches(CardPattern.VISA_VALID) || getCardNumber().matches(CardPattern.MASTERCARD_VALID)
+                || getCardNumber().matches(CardPattern.AMERICAN_EXPRESS_VALID) || getCardNumber().matches(CardPattern.DISCOVER_VALID)
+                || getCardNumber().matches(CardPattern.DINERS_CLUB_VALID) || getCardNumber().matches(CardPattern.JCB_VALID);*/
+        final ArrayList<String> listOfPattern = new ArrayList<>();
+        String ptVisa = "^4[0-9]{6,}$";
+        listOfPattern.add(ptVisa);
+        String ptMasterCard = "^5[1-5][0-9]{5,}$";
+        listOfPattern.add(ptMasterCard);
+        String ptAmeExp = "^3[47][0-9]{5,}$";
+        listOfPattern.add(ptAmeExp);
+        String ptDinClb = "^3(?:0[0-5]|[68][0-9])[0-9]{4,}$";
+        listOfPattern.add(ptDinClb);
+        String ptDiscover = "^6(?:011|5[0-9]{2})[0-9]{3,}$";
+        listOfPattern.add(ptDiscover);
+        String ptJcb = "^(?:2131|1800|35[0-9]{3})[0-9]{3,}$";
+        listOfPattern.add(ptJcb);
+        String cardNumber = getCardNumber();
+        for (String pattern : listOfPattern) {
+            if (cardNumber.matches(pattern)) {
+                return true;
+            }
+        }
         return false;
     }
 

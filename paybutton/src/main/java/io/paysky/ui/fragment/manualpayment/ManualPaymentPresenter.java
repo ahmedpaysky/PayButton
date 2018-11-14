@@ -10,21 +10,20 @@ import io.paysky.data.model.response.Compose3dsTransactionResponse;
 import io.paysky.data.model.response.ManualPaymentResponse;
 import io.paysky.data.network.ApiConnection;
 import io.paysky.data.network.ApiResponseListener;
-import io.paysky.ui.base.PaymentTransactionListener;
-import io.paysky.ui.fragment.paymentfail.PaymentFailedFragment;
+import io.paysky.exception.TransactionException;
 import io.paysky.ui.mvp.BasePresenter;
 import io.paysky.util.AppConstant;
 import io.paysky.util.AppUtils;
 import io.paysky.util.HashGenerator;
+import io.paysky.util.TransactionManager;
 
 class ManualPaymentPresenter extends BasePresenter<ManualPaymentView> {
 
     private PaymentData paymentData;
 
     ManualPaymentPresenter(Bundle arguments) {
-
         paymentData = arguments.getParcelable(AppConstant.BundleKeys.PAYMENT_DATA);
-
+        TransactionManager.setTransactionType(TransactionManager.TransactionType.MANUAL);
     }
 
     public void makePayment(String cardNumber, String expireDate, String cardOwnerName, String ccv) {
@@ -56,7 +55,7 @@ class ManualPaymentPresenter extends BasePresenter<ManualPaymentView> {
         request.terminalId = terminalId;
         request.amountTrxn = AppUtils.formatPaymentAmountToServer(amount);
         request.cVV2 = ccv2;
-        request.merchantReference = AppUtils.generateRandomNumber();
+        request.merchantReference = paymentData.transactionReferenceNumber;
         request.currencyCodeTrxn = Integer.valueOf(currencyCode);
         request.dateExpiration = dateExpiration;
         request.pAN = pan;
@@ -65,6 +64,7 @@ class ManualPaymentPresenter extends BasePresenter<ManualPaymentView> {
         ApiConnection.compose3dsTransaction(request, new ApiResponseListener<Compose3dsTransactionResponse>() {
             @Override
             public void onSuccess(Compose3dsTransactionResponse response) {
+                if (isViewDetached())return;
                 view.dismissProgress();
                 String webBody = String.format("vpc_AccessCode=%s&vpc_Amount=%s&vpc_Card=%s&vpc_CardExp=%s&vpc_CardNum=%s&vpc_CardSecurityCode=%s&vpc_Command=%s&vpc_Currency=%s&" +
                                 "vpc_Gateway=%s&vpc_MerchTxnRef=%s&vpc_Merchant=%s&vpc_ReturnURL=%s&vpc_Version=%s&vpc_SecureHash=%s&vpc_SecureHashType=%s",
@@ -89,9 +89,10 @@ class ManualPaymentPresenter extends BasePresenter<ManualPaymentView> {
 
             @Override
             public void onFail(Throwable error) {
+                if (isViewDetached())return;
                 error.printStackTrace();
                 view.dismissProgress();
-                view.showErrorInServerDialog();
+                view.showErrorInServerToast();
             }
         });
     }
@@ -116,11 +117,7 @@ class ManualPaymentPresenter extends BasePresenter<ManualPaymentView> {
         paymentRequest.dateExpiration = expiryDate;
         paymentRequest.iSFromPOS = true;
         paymentRequest.pAN = cardNumber;
-        paymentRequest.hostID = 105;
-        paymentRequest.messageTypeID = "0200";
-        paymentRequest.pOSEntryMode = "011";
-        paymentRequest.processingCode = "000000";
-        paymentRequest.systemTraceNr = AppUtils.generateRandomNumber();
+        paymentRequest.systemTraceNr = paymentData.transactionReferenceNumber;
         paymentRequest.dateTimeLocalTrxn = AppUtils.getDateTimeLocalTrxn();
         paymentRequest.merchantId = merchantId;
         paymentRequest.terminalId = terminalId;
@@ -130,18 +127,25 @@ class ManualPaymentPresenter extends BasePresenter<ManualPaymentView> {
         ApiConnection.executePayment(paymentRequest, new ApiResponseListener<ManualPaymentResponse>() {
             @Override
             public void onSuccess(ManualPaymentResponse response) {
+                if (isViewDetached())return;
                 // server make response.
                 view.dismissProgress();
 
                 if (response.mWActionCode != null) {
-                    view.setFailTransactionError(new Exception(response.mWMessage));
+                    TransactionException transactionException = new TransactionException();
+                    transactionException.errorMessage = response.mWMessage;
+                    TransactionManager.setTransactionException(transactionException);
+
                     Bundle bundle = new Bundle();
                     bundle.putString("decline_cause", response.mWMessage);
                     bundle.putString("opened_by","manual_payment");
                     view.showPaymentFailedFragment(bundle);
                 } else {
                     if (response.actionCode == null || response.actionCode.isEmpty() || !response.actionCode.equals("00")) {
-                        view.setFailTransactionError(new Exception(response.message));
+                        TransactionException transactionException = new TransactionException();
+                        transactionException.errorMessage = response.message;
+                        TransactionManager.setTransactionException(transactionException);
+
                         Bundle bundle = new Bundle();
                         bundle.putString("decline_cause", response.message);
                         bundle.putString("opened_by","manual_payment");
@@ -157,8 +161,10 @@ class ManualPaymentPresenter extends BasePresenter<ManualPaymentView> {
                         cardTransaction.ReceiptNumber = response.receiptNumber;
                         cardTransaction.SystemReference = response.systemReference + "";
                         cardTransaction.Success = response.success;
-
-                        view.successCardTransaction(cardTransaction);
+                        cardTransaction.merchantId = paymentData.merchantId;
+                        cardTransaction.terminalId = paymentData.terminalId;
+                        cardTransaction.amount = paymentData.executedTransactionAmount;
+                        TransactionManager.setCardTransaction(cardTransaction);
                         view.showTransactionApprovedFragment(response.transactionNo, response.authCode,
                                 response.receiptNumber, cardHolder, cardNumber, response.systemReference + "", paymentData);
                     }
@@ -168,10 +174,13 @@ class ManualPaymentPresenter extends BasePresenter<ManualPaymentView> {
             @Override
             public void onFail(Throwable error) {
                 // payment failed.
+                if (isViewDetached())return;
                 view.dismissProgress();
-                view.setFailTransactionError(error);
+                TransactionException transactionException = new TransactionException();
+                transactionException.errorMessage = error.getMessage();
+                TransactionManager.setTransactionException(transactionException);
                 error.printStackTrace();
-                view.showErrorInServerDialog();
+                view.showErrorInServerToast();
             }
         });
     }

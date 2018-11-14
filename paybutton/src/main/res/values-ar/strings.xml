@@ -16,9 +16,9 @@
     <string name="error">خطأ</string>
     <string name="check_internet_connection">تحقق من الاتصال بالانترنت,وحاول مرة أخرى.</string>
     <string name="ok">موافق</string>
-    <string name="invalid_card_number_length">تحقق من ادخال 16 رقم للبطاقة</string>
-    <string name="enter_valid_owner">اسم صاحب البطاقة غير صحيح.</string>
-    <string name="invalid_expire_date">تاريخ الانتهاء يجب الا يزيد عن اربع ارقام</string>
+    <string name="invalid_card_number_length">رقم الكارت غير صحيح</string>
+    <string name="enter_valid_owner">ادخل اسم صاحب البطاقه</string>
+    <string name="invalid_expire_date">تاريخ الانتهاء يجب ان يكون اربعه ارقام</string>
     <string name="invalid_ccv">رمز الحماية يجب ان يكون 3 ارقام.</string>
     <string name="please_wait">برجاء الانتظار…</string>
     <string name="error_try_again">خطأ فى الاتصال,حاول مرة أخرى.</string>
@@ -49,14 +49,16 @@
     <string name="sms_received_within">ستصلك رسالة فى غضون </string>
     <string name="seconds">ثانية</string>
     <string name="terms_conditions_text">شروط واحكام شركة باى سكاى لاستخدام خدماتها</string>
-    <string name="send_sms_success">تم ارسال الرسالة.</string>
+    <string name="sent_request_success">تم ارسال الطلب بنجاح</string>
     <string name="or">أو</string>
     <string name="cant_scan_code">لا تستطيع فحص الصور؟ \n قم بارسال المعاملة عن طريق رقم التليفون.</string>
     <string name="request_payment">طلب اموال</string>
     <string name="invalid_expire_date_date">تاريخ الانتهاء غير صحيح.</string>
     <string name="egp">جنية</string>
-    <string name="print">إطبع الفاتوره</string>
-    <string name="powered_paysky">تم التطوير بواسطه باى سكاى</string>
-    <string name="failed_load_merchant_data">فشل قرأه بيانات التاجر,حاول مره أخرى؟</string>
+    <string name="print">إطبع الفاتورة</string>
+    <string name="powered_paysky">تم التطوير بواسطة باى سكاى</string>
+    <string name="failed_load_merchant_data">فشل التوثيق.</string>
     <string name="cancel">الغاء</string>
+    <string name="allow_light_scan">افتح فلاش الكاميرا لتصوير اسرع</string>
+    <string name="invalid_ccv_value">رمز غير صحيح</string>
 </resources>

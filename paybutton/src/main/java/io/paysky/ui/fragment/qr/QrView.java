@@ -17,11 +17,13 @@ public interface QrView extends BaseView {
 
     void setGenerateQrSuccess(long txnId);
 
-    void showInfoDialog(String message);
+    void showInfoToast(String message);
 
-    void showErrorInServerDialog();
+    void showErrorInServerToast();
 
     Context getContext();
 
     void showQrImage(Bitmap bitmap);
+
+    void disableR2pViews();
 }

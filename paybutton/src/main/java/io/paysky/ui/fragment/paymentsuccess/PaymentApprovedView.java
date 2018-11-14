@@ -10,5 +10,5 @@ interface PaymentApprovedView extends BaseView {
 
     Context getContext();
 
-    void showErrorDialog(@StringRes int error);
+    void showErrorToast(@StringRes int error);
 }

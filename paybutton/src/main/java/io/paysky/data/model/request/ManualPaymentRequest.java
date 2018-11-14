@@ -28,9 +28,6 @@ public class ManualPaymentRequest {
     @SerializedName("ProcessingCode")
     public String processingCode;
 
-    @SerializedName("HostID")
-    public int hostID;
-
     @SerializedName("CardAcceptorTerminalID")
     public String cardAcceptorTerminalID;
 
@@ -63,7 +60,6 @@ public class ManualPaymentRequest {
 
     @SerializedName("IsWebRequest")
     public boolean isWebRequest = true;
-
 
     @SerializedName("VerToken")
     public String verToken;

@@ -11,13 +11,9 @@ public interface ManualPaymentView extends BaseView {
 
     void show3dpWebView(String webBody, String paymentServerURL, int gatewayType,PaymentData paymentData);
 
-    void showErrorInServerDialog();
-
-    void setFailTransactionError(Throwable exception);
+    void showErrorInServerToast();
 
     void showPaymentFailedFragment(Bundle bundle);
-
-    void successCardTransaction(SuccessfulCardTransaction cardTransaction);
 
     void showTransactionApprovedFragment(String transactionNo, String authCode, String receiptNumber, String cardHolder, String cardNumber, String systemReference, PaymentData paymentData);
 }

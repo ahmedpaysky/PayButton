@@ -8,8 +8,8 @@ android {
     defaultConfig {
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 20
-        versionName "1.1.20"
+        versionCode 22
+        versionName "1.1.22"
         // Enabling multidex support.
         multiDexEnabled true
     }
@@ -65,4 +65,6 @@ dependencies {
     implementation files('libs/magnetictrackparser-2.01.02.jar')
     implementation files('libs/platform_sdk_v2.4.0210.jar')
     compile 'com.android.support:multidex:1.0.3'
+    compile 'me.grantland:autofittextview:0.2.+'
+    compile 'uk.co.chrisjenx:calligraphy:2.3.0'
 }

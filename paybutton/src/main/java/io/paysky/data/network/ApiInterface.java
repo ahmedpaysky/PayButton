@@ -1,19 +1,21 @@
 package io.paysky.data.network;
 
+import io.paysky.data.model.request.CheckTransactionStatusRequest;
 import io.paysky.data.model.request.ManualPaymentRequest;
 import io.paysky.data.model.request.MerchantInfoRequest;
 import io.paysky.data.model.request.Process3dTransactionRequest;
 import io.paysky.data.model.request.QrGeneratorRequest;
 import io.paysky.data.model.request.SendReceiptByMailRequest;
-import io.paysky.data.model.request.SmsPaymentRequest;
+import io.paysky.data.model.request.RequestToPayRequest;
 import io.paysky.data.model.request.TransactionStatusRequest;
 import io.paysky.data.model.request.Compose3dsTransactionRequest;
+import io.paysky.data.model.response.CheckTransactionStatusResponse;
 import io.paysky.data.model.response.GenerateQrCodeResponse;
 import io.paysky.data.model.response.ManualPaymentResponse;
 import io.paysky.data.model.response.MerchantInfoResponse;
 import io.paysky.data.model.response.Process3dTransactionResponse;
 import io.paysky.data.model.response.SendReceiptByMailResponse;
-import io.paysky.data.model.response.SmsPaymentResponse;
+import io.paysky.data.model.response.RequestToPayResponse;
 import io.paysky.data.model.response.TransactionStatusResponse;
 import io.paysky.data.model.response.Compose3dsTransactionResponse;
 import retrofit2.Call;
@@ -40,7 +42,7 @@ public interface ApiInterface {
     Call<ManualPaymentResponse> executeManualPayment(@Body ManualPaymentRequest paymentRequest);
 
     @POST(ApiLinks.SMS_PAYMENT)
-    Call<SmsPaymentResponse> requestToPay(@Body SmsPaymentRequest request);
+    Call<RequestToPayResponse> requestToPay(@Body RequestToPayRequest request);
 
     @POST(ApiLinks.MERCHANT_INFO)
     Call<MerchantInfoResponse> getMerchantInfo(@Body MerchantInfoRequest request);
@@ -50,4 +52,7 @@ public interface ApiInterface {
 
     @POST(ApiLinks.PROCESS_3D_TRANSACTION)
     Call<Process3dTransactionResponse> process3dTransaction(@Body Process3dTransactionRequest request);
+
+    @POST(ApiLinks.CHECK_TRANSACTION_STATUS)
+    Call<CheckTransactionStatusResponse> checkTransaction(@Body CheckTransactionStatusRequest request);
 }

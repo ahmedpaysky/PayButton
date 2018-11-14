@@ -14,10 +14,10 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.StringRes;
-import android.support.v4.app.FragmentActivity;
 import android.text.Html;
 import android.text.TextUtils;
 import android.view.View;
+import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 
@@ -25,6 +25,8 @@ import com.example.paybutton.R;
 
 import org.greenrobot.eventbus.EventBus;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.Calendar;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -109,7 +111,7 @@ public class AppUtils {
     public static String generateRandomNumber() {
         StringBuilder stringBuilder = new StringBuilder();
         int index = 0;
-        while (index < 6) {
+        while (index < 10) {
             stringBuilder.append(1 + (int) (Math.random() * 49));
             index++;
         }
@@ -151,8 +153,10 @@ public class AppUtils {
 
         return value.replace("١", "1").replace("٢", "2")
                 .replace("٣", "3").replace("٤", "4").replace("٥", "5")
-                .replace("٦", "6").replace("7", "٧").replace("٨", "8").replace("٩", "9").replace("٠", "0")
-                .replace("۱", "1").replace("۲", "2").replace("۳", "3").replace("۴", "4").replace("۵", "5")
+                .replace("٦", "6").replace("7", "٧").replace("٨", "8")
+                .replace("٩", "9").replace("٠", "0")
+                .replace("۱", "1").replace("۲", "2").replace("۳", "3")
+                .replace("۴", "4").replace("۵", "5")
                 .replace("۶", "6").replace("۷", "7").replace("۸", "8")
                 .replace("۹", "9").replace("۰", "0").replace("٫", ".");
     }
@@ -217,4 +221,17 @@ public class AppUtils {
             e.printStackTrace();
         }
     }
+
+    public static String currencyFormat(String amount) {
+        DecimalFormat formatter = new DecimalFormat("###,###,##0.00");
+        formatter.setRoundingMode(RoundingMode.FLOOR);
+        return formatter.format(Double.parseDouble(amount));
+    }
+
+
+    public static void preventScreenshot(Activity context) {
+        context.getWindow().setFlags(WindowManager.LayoutParams.FLAG_SECURE, WindowManager.LayoutParams.FLAG_SECURE);
+    }
+
+
 }

@@ -8,10 +8,10 @@ import com.example.paybutton.R;
 
 import io.paysky.data.model.PaymentData;
 import io.paysky.data.model.request.QrGeneratorRequest;
-import io.paysky.data.model.request.SmsPaymentRequest;
+import io.paysky.data.model.request.RequestToPayRequest;
 import io.paysky.data.model.request.TransactionStatusRequest;
 import io.paysky.data.model.response.GenerateQrCodeResponse;
-import io.paysky.data.model.response.SmsPaymentResponse;
+import io.paysky.data.model.response.RequestToPayResponse;
 import io.paysky.data.model.response.TransactionStatusResponse;
 import io.paysky.data.network.ApiConnection;
 import io.paysky.data.network.ApiResponseListener;
@@ -22,6 +22,7 @@ import io.paysky.util.AppUtils;
 import io.paysky.util.ConvertQrCodToBitmapTask;
 import io.paysky.util.HashGenerator;
 import io.paysky.util.QrBitmapLoadListener;
+import io.paysky.util.TransactionManager;
 
 public class QrPresenter extends BasePresenter<QrView> implements QrBitmapLoadListener {
 
@@ -32,6 +33,7 @@ public class QrPresenter extends BasePresenter<QrView> implements QrBitmapLoadLi
 
     QrPresenter(Bundle arguments) {
         paymentData = arguments.getParcelable(AppConstant.BundleKeys.PAYMENT_DATA);
+        TransactionManager.setTransactionType(TransactionManager.TransactionType.QR);
     }
 
     public void checkPaymentApproval(long transactionId) {
@@ -46,6 +48,7 @@ public class QrPresenter extends BasePresenter<QrView> implements QrBitmapLoadLi
         ApiConnection.checkTransactionPaymentStatus(request, new ApiResponseListener<TransactionStatusResponse>() {
             @Override
             public void onSuccess(TransactionStatusResponse response) {
+                if (isViewDetached())return;
                 if (response.success) {
                     // payment success.
                     if (response.isPaid) {
@@ -60,6 +63,7 @@ public class QrPresenter extends BasePresenter<QrView> implements QrBitmapLoadLi
 
             @Override
             public void onFail(Throwable error) {
+                if (isViewDetached())return;
                 error.printStackTrace();
                 view.listenToPaymentApproval();
             }
@@ -72,17 +76,20 @@ public class QrPresenter extends BasePresenter<QrView> implements QrBitmapLoadLi
             return;
         }
         view.showProgress();
-        QrGeneratorRequest request = new QrGeneratorRequest();
-        request.setAmount(paymentData.amountFormatted);
-        request.setMerchantId(paymentData.merchantId);
-        request.setTerminalId(paymentData.terminalId);
-        request.setTahweelQR(true);
-        request.setmVisaQR(true);
-        request.setDateTimeLocalTrxn(request.getDateTimeLocalTrxn());
-        request.setSecureHash(HashGenerator.encode(paymentData.secureHashKey, request.getDateTimeLocalTrxn(), paymentData.merchantId, paymentData.terminalId));
-        ApiConnection.generateQrCode(request, new ApiResponseListener<GenerateQrCodeResponse>() {
+        QrGeneratorRequest qrGeneratorRequest = new QrGeneratorRequest();
+        qrGeneratorRequest.Amount = paymentData.amountFormatted;
+        qrGeneratorRequest.MerchantId = paymentData.merchantId;
+        qrGeneratorRequest.TerminalId = paymentData.terminalId;
+        qrGeneratorRequest.tahweelQR = true;
+        qrGeneratorRequest.mVisaQR = true;
+        qrGeneratorRequest.MerchantReference = paymentData.transactionReferenceNumber;
+        qrGeneratorRequest.DateTimeLocalTrxn = AppUtils.getDateTimeLocalTrxn();
+        qrGeneratorRequest.SecureHash = HashGenerator.encode(paymentData.secureHashKey, qrGeneratorRequest.DateTimeLocalTrxn, paymentData.merchantId, paymentData.terminalId);
+
+        ApiConnection.generateQrCode(qrGeneratorRequest, new ApiResponseListener<GenerateQrCodeResponse>() {
             @Override
             public void onSuccess(GenerateQrCodeResponse response) {
+                if (isViewDetached())return;
                 view.dismissProgress();
                 if (response.success) {
                     qrCode = response.iSOQR;
@@ -93,15 +100,16 @@ public class QrPresenter extends BasePresenter<QrView> implements QrBitmapLoadLi
                     new ConvertQrCodToBitmapTask(QrPresenter.this, (int) sizePx).execute(response.iSOQR);
                     view.setGenerateQrSuccess(response.txnId);
                 } else {
-                    view.showInfoDialog(response.message);
+                    view.showInfoToast(response.message);
                 }
             }
 
             @Override
             public void onFail(Throwable error) {
+                if (isViewDetached())return;
                 view.dismissProgress();
                 error.printStackTrace();
-                view.showErrorInServerDialog();
+                view.showErrorInServerToast();
             }
         });
     }
@@ -112,38 +120,43 @@ public class QrPresenter extends BasePresenter<QrView> implements QrBitmapLoadLi
             return;
         }
         view.showProgress();
-        SmsPaymentRequest smsPaymentRequest = new SmsPaymentRequest();
-        smsPaymentRequest.dateTimeLocalTrxn = AppUtils.getDateTimeLocalTrxn();
-        smsPaymentRequest.iSOQR = qrCode;
-        smsPaymentRequest.merchantId = paymentData.merchantId;
-        smsPaymentRequest.terminalId = paymentData.terminalId;
-        smsPaymentRequest.txnId = transactionId;
-        smsPaymentRequest.mobileNumber = mobileNumber;
+        RequestToPayRequest requestToPayRequest = new RequestToPayRequest();
+        requestToPayRequest.dateTimeLocalTrxn = AppUtils.getDateTimeLocalTrxn();
+        requestToPayRequest.iSOQR = qrCode;
+        requestToPayRequest.merchantId = paymentData.merchantId;
+        requestToPayRequest.terminalId = paymentData.terminalId;
+        requestToPayRequest.txnId = transactionId;
+        requestToPayRequest.mobileNumber = mobileNumber;
+        requestToPayRequest.merchantReference = paymentData.transactionReferenceNumber;
         // generate hashing.
-        smsPaymentRequest.secureHash = HashGenerator.encode(paymentData.secureHashKey, smsPaymentRequest.dateTimeLocalTrxn, paymentData.merchantId, paymentData.terminalId);
-        ApiConnection.requestToPay(smsPaymentRequest, new ApiResponseListener<SmsPaymentResponse>() {
+        requestToPayRequest.secureHash = HashGenerator.encode(paymentData.secureHashKey, requestToPayRequest.dateTimeLocalTrxn, paymentData.merchantId, paymentData.terminalId);
+        ApiConnection.requestToPay(requestToPayRequest, new ApiResponseListener<RequestToPayResponse>() {
             @Override
-            public void onSuccess(SmsPaymentResponse response) {
+            public void onSuccess(RequestToPayResponse response) {
+                if (isViewDetached())return;
                 view.dismissProgress();
                 if (response.success) {
-                    view.showToast(R.string.send_sms_success);
+                    view.disableR2pViews();
+                    view.showToast(R.string.sent_request_success);
                     view.listenToPaymentApproval();
                 } else {
-                    view.showInfoDialog(response.message);
+                    view.showInfoToast(response.message);
                 }
             }
 
             @Override
             public void onFail(Throwable error) {
+                if (isViewDetached())return;
                 view.dismissProgress();
                 error.printStackTrace();
-                view.showErrorInServerDialog();
+                view.showErrorInServerToast();
             }
         });
     }
 
     @Override
     public void onLoadBitmapQrSuccess(Bitmap bitmap) {
+        if (isViewDetached())return;
         view.dismissProgress();
         PaymentActivity.qrBitmap = bitmap;
         view.showQrImage(bitmap);
@@ -152,6 +165,6 @@ public class QrPresenter extends BasePresenter<QrView> implements QrBitmapLoadLi
     @Override
     public void onLoadBitmapQrFailed() {
         view.dismissProgress();
-        view.showErrorInServerDialog();
+        view.showErrorInServerToast();
     }
 }

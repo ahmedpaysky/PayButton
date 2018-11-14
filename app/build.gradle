@@ -6,8 +6,8 @@ android {
         applicationId "com.example.paybutton"
         minSdkVersion 17
         targetSdkVersion 27
-        versionCode 20
-        versionName "1.1.20"
+        versionCode 22
+        versionName "1.1.22"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -38,11 +38,9 @@ android {
 }
 
 dependencies {
-
     implementation 'com.android.support:appcompat-v7:27.1.1'
     implementation 'com.android.support.constraint:constraint-layout:1.1.2'
     compile 'com.android.support:multidex:1.0.3'
-    implementation 'com.github.payskyCompany:payButton:1.1.18'
-
+    implementation project(':paybutton')
 }
 tasks.withType(Javadoc).all { enabled = false }

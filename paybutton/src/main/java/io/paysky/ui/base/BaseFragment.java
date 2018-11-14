@@ -40,11 +40,13 @@ public class BaseFragment extends Fragment implements BaseView {
     }
 
     public void showProgress(@StringRes int message) {
+        if (isDetached())return;
         showProgress(getString(message));
     }
 
     @Override
     public void dismissProgress() {
+        if (isDetached())return;
         if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
             progressDialog = null;
@@ -78,10 +80,6 @@ public class BaseFragment extends Fragment implements BaseView {
         new InfoDialog(activity).setDialogTitle(R.string.error)
                 .setDialogText(R.string.check_internet_connection)
                 .showAgreeButton(R.string.ok, null).showDialog();
-    }
-
-    public boolean isAppLanguageAr() {
-        return LocaleHelper.getLocale(getActivity()).equals("ar");
     }
 
     public boolean isEmpty(String text) {

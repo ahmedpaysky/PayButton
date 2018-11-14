@@ -11,7 +11,12 @@ public class PaymentData implements Parcelable {
     public String amountFormatted;
     public String secureHashKey;
     public String currencyCode;
+    public String transactionReferenceNumber;
     public boolean is3dsEnabled;
+    public int paymentMethod;
+    public boolean isTahweel, isVisa;
+    public String currencyName;
+    public String executedTransactionAmount;
 
     public PaymentData() {
 
@@ -26,7 +31,13 @@ public class PaymentData implements Parcelable {
         amountFormatted = in.readString();
         secureHashKey = in.readString();
         currencyCode = in.readString();
-        is3dsEnabled = in.readInt() == 0;
+        transactionReferenceNumber = in.readString();
+        is3dsEnabled = in.readByte() != 0;
+        paymentMethod = in.readInt();
+        isTahweel = in.readByte() != 0;
+        isVisa = in.readByte() != 0;
+        currencyName = in.readString();
+        executedTransactionAmount = in.readString();
     }
 
     public static final Creator<PaymentData> CREATOR = new Creator<PaymentData>() {
@@ -56,6 +67,12 @@ public class PaymentData implements Parcelable {
         parcel.writeString(amountFormatted);
         parcel.writeString(secureHashKey);
         parcel.writeString(currencyCode);
-        parcel.writeInt((is3dsEnabled) ? 1 : 0);
+        parcel.writeString(transactionReferenceNumber);
+        parcel.writeByte((byte) (is3dsEnabled ? 1 : 0));
+        parcel.writeInt(paymentMethod);
+        parcel.writeByte((byte) (isTahweel ? 1 : 0));
+        parcel.writeByte((byte) (isVisa ? 1 : 0));
+        parcel.writeString(currencyName);
+        parcel.writeString(executedTransactionAmount);
     }
 }

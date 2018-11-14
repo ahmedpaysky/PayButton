@@ -48,18 +48,16 @@ public class LocaleHelper {
     }
 
 
-    public static void saveLocale(Context context, String locale) {
-        PrefsUtils.save(context, "language", locale);
+    public static String getLocale(){
+        return Locale.getDefault().getLanguage();
     }
 
-
-    public static String getLocale(Context context) {
-        String language = PrefsUtils.get(context, "language");
-        if (language.isEmpty()){
-            return "en";
+    public static void changeAppLanguage(Context context) {
+        String appLocale = Locale.getDefault().getLanguage();
+        if (appLocale.equals("ar")) {
+            setLocale(context, "en");
+        } else {
+            setLocale(context, "ar");
         }
-        return language;
     }
-
-
 }

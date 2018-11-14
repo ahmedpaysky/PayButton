@@ -1,20 +1,22 @@
 package io.paysky.ui.fragment.webview;
 
 
-import android.app.ProgressDialog;
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.util.Base64;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.webkit.WebChromeClient;
+import android.webkit.ValueCallback;
+import android.webkit.WebResourceError;
+import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -34,16 +36,16 @@ import io.paysky.data.model.response.ManualPaymentResponse;
 import io.paysky.data.model.response.Process3dTransactionResponse;
 import io.paysky.data.network.ApiConnection;
 import io.paysky.data.network.ApiResponseListener;
+import io.paysky.exception.TransactionException;
 import io.paysky.ui.activity.payment.PaymentActivity;
 import io.paysky.ui.base.BaseFragment;
-import io.paysky.ui.base.PaymentTransactionListener;
-import io.paysky.ui.dialog.InfoDialog;
 import io.paysky.ui.fragment.paymentfail.PaymentFailedFragment;
 import io.paysky.ui.fragment.paymentsuccess.PaymentApprovedFragment;
 import io.paysky.util.AppConstant;
 import io.paysky.util.AppUtils;
-import io.paysky.util.DialogUtils;
 import io.paysky.util.HashGenerator;
+import io.paysky.util.ToastUtils;
+import io.paysky.util.TransactionManager;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -70,7 +72,6 @@ public class WebPaymentFragment extends BaseFragment implements WebPaymentView {
         super.onCreate(savedInstanceState);
 
         presenter = new WebPaymentPresenter();
-        presenter.attachView(this);
         activity = (PaymentActivity) getActivity();
         extractBundleData();
     }
@@ -97,6 +98,7 @@ public class WebPaymentFragment extends BaseFragment implements WebPaymentView {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        presenter.attachView(this);
         initView(view);
     }
 
@@ -136,19 +138,18 @@ public class WebPaymentFragment extends BaseFragment implements WebPaymentView {
         {
             @Override
             public void onSuccess(ManualPaymentResponse response) {
-                if (isDetached())return;
+                if (!isVisible()) return;
                 // server make response.
                 dismissProgress();
-                PaymentTransactionListener transaction = ((PaymentTransactionListener) getActivity());
                 if (response.mWActionCode != null) {
-                    transaction.setFailTransactionError(new Exception(response.mWMessage));
+                    TransactionManager.setTransactionException(new TransactionException(response.mWMessage));
                     Bundle bundle = new Bundle();
                     bundle.putString("decline_cause", response.mWMessage);
-                    bundle.putString("opened_by","manual_payment");
+                    bundle.putString("opened_by", "manual_payment");
                     activity.replaceFragmentAndAddOldToBackStack(PaymentFailedFragment.class, bundle);
                 } else {
                     if (response.actionCode == null || response.actionCode.isEmpty() || !response.actionCode.equals("00")) {
-                        transaction.setFailTransactionError(new Exception(response.message));
+                        TransactionManager.setTransactionException(new TransactionException(response.message));
                         Bundle bundle = new Bundle();
                         bundle.putString("decline_cause", response.message);
                         activity.replaceFragmentAndRemoveOldFragment(PaymentFailedFragment.class, bundle);
@@ -163,8 +164,10 @@ public class WebPaymentFragment extends BaseFragment implements WebPaymentView {
                         cardTransaction.ReceiptNumber = response.receiptNumber;
                         cardTransaction.SystemReference = response.systemReference + "";
                         cardTransaction.Success = response.success;
-                        transaction.successCardTransaction(cardTransaction);
-
+                        cardTransaction.merchantId = paymentData.merchantId;
+                        cardTransaction.terminalId = paymentData.terminalId;
+                        cardTransaction.amount = paymentData.executedTransactionAmount;
+                        TransactionManager.setCardTransaction(cardTransaction);
                         showTransactionApprovedFragment(response.transactionNo, response.authCode,
                                 response.receiptNumber, "", cardNumber, response.systemReference + "");
                     }
@@ -173,12 +176,12 @@ public class WebPaymentFragment extends BaseFragment implements WebPaymentView {
 
             @Override
             public void onFail(Throwable error) {
-                // payment failed.
-                if (isDetached())return;
-                dismissProgress();
-                activity.setFailTransactionError(error);
                 error.printStackTrace();
-                DialogUtils.showInfoDialog(activity, getString(R.string.error_try_again));
+                // payment failed.
+                if (!isVisible()) return;
+                dismissProgress();
+                TransactionManager.setTransactionException(new TransactionException(error.getMessage()));
+                ToastUtils.showLongToast(activity, getString(R.string.error_try_again));
             }
         });
     }
@@ -204,6 +207,7 @@ public class WebPaymentFragment extends BaseFragment implements WebPaymentView {
         transactionData.transactionType = ReceiptData.TransactionType.SALE.name();
         transactionData.secureHashKey = paymentData.secureHashKey;
         bundle.putParcelable(AppConstant.BundleKeys.RECEIPT, transactionData);
+        activity.hidePaymentOptions();
         activity.replaceFragmentAndRemoveOldFragment(PaymentApprovedFragment.class, bundle);
     }
 
@@ -211,11 +215,13 @@ public class WebPaymentFragment extends BaseFragment implements WebPaymentView {
     @Override
     public void load3dTransactionWebView() {
         webView.postUrl(url, requestBody.getBytes());
-
-        webView.setWebViewClient(new WebViewClient() {
+        WebViewClient webViewClient = new WebViewClient() {
             @Override
-            public void onPageStarted(final WebView view, final String url, Bitmap favicon) {
+            public void onPageStarted(final WebView view, final String url, final Bitmap favicon) {
                 super.onPageStarted(view, url, favicon);
+                if (!isVisible()) {
+                    return;
+                }
                 if (url.startsWith("http://localhost.com")) {
                     // call server.
                     Uri uri = Uri.parse(url);
@@ -237,21 +243,36 @@ public class WebPaymentFragment extends BaseFragment implements WebPaymentView {
                     request.terminalId = paymentData.terminalId;
                     request.secureHash = HashGenerator.encode(paymentData.secureHashKey, request.dateTimeLocalTrxn, paymentData.merchantId, paymentData.terminalId);
                     request.threeDSResponseData = Base64.encodeToString(jsonObject.toString().getBytes(), Base64.DEFAULT);
-
+                    // call Api.
                     ApiConnection.process3dTransaction(request, new ApiResponseListener<Process3dTransactionResponse>() {
                         @Override
                         public void onSuccess(Process3dTransactionResponse response) {
+                            if (!isVisible()) {
+                                return;
+                            }
                             dismissProgress();
-                            executeTransaction(response);
+                            if (response.success) {
+                                executeTransaction(response);
+                            } else {
+                                ToastUtils.showLongToast(activity, response.message);
+                                activity.showPaymentBasedOnPaymentOptions(0);
+                            }
                         }
 
                         @Override
                         public void onFail(Throwable error) {
+                            if (!isVisible()) {
+                                return;
+                            }
                             dismissProgress();
-                            Log.d("LOG", "error = " + error.getMessage());
+                            ToastUtils.showLongToast(activity, getString(R.string.error_try_again));
+                            activity.showPaymentBasedOnPaymentOptions(0);
                         }
                     });
                 } else {
+                    if (!isVisible()) {
+                        return;
+                    }
                     showProgress();
                 }
             }
@@ -259,8 +280,62 @@ public class WebPaymentFragment extends BaseFragment implements WebPaymentView {
             @Override
             public void onPageFinished(WebView view, String url) {
                 super.onPageFinished(view, url);
+                if (!isVisible()) {
+                    return;
+                }
                 dismissProgress();
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                    webView.evaluateJavascript(
+                            "document.documentElement.outerHTML;",
+                            new ValueCallback<String>() {
+                                @Override
+                                public void onReceiveValue(String html) {
+                                    if (html.contains("HTTP Status - 400")) {
+                                        try {
+                                            html = html.replaceAll("<.*?>", "");
+                                            html = html.substring(html.indexOf("E5000:") + 7);
+                                            html = html.substring(0, html.indexOf("\\u003C"));
+                                            ToastUtils.showLongToast(getActivity(), html);
+                                            TransactionManager.setTransactionException(new TransactionException(html));
+                                        } catch (Exception e) {
+                                            e.printStackTrace();
+                                            ToastUtils.showLongToast(getActivity(), getString(R.string.error_try_again));
+                                        }
+                                        webView.setWebViewClient(null);
+                                        activity.showPaymentBasedOnPaymentOptions(0);
+                                    }
+                                }
+                            });
+                }
             }
-        });
+
+            @TargetApi(Build.VERSION_CODES.M)
+            @Override
+            public void onReceivedError(WebView view, WebResourceRequest req, WebResourceError rerr) {
+                onReceivedError(view, rerr.getErrorCode(), rerr.getDescription().toString(), req.getUrl().toString());
+            }
+
+            @SuppressWarnings("deprecation")
+            public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+                if (!isVisible()) return;
+                //-2 address not reachable , -14 error in server.
+                if (errorCode == -14 || errorCode==-2) {
+                    // error in server.
+                    if (!isVisible()) return;
+                    dismissProgress();
+                    ToastUtils.showLongToast(activity, getString(R.string.error_try_again));
+                    activity.showPaymentBasedOnPaymentOptions(0);
+                    webView.setWebViewClient(null);
+                }
+            }
+
+        };
+        webView.setWebViewClient(webViewClient);
+    }
+
+    @Override
+    public void onDestroyView() {
+        presenter.detachView();
+        super.onDestroyView();
     }
 }
