@@ -46,11 +46,11 @@ in order to use our SDK you should get merchant id and Terminal id from our comp
 1 – create a new instance from PayButton:-  
 PayButton payButton = new PayButton(context);
 
-you need to just pass some parameters to our button to know merchant data and amount this parameters is:-
-  1-Merchat id
-  2-Terminal id
-  3-Payment amount
-  4-Currency code
+you need to just pass some parameters to PayButton class instance :-
+  1-Merchat id.
+  2-Terminal id.
+  3-Payment amount.
+  4-Currency code [Optional].
   5-merchant secure hash.
   
 Note That:-
@@ -61,8 +61,8 @@ Example:-
 payButton.setMerchantId(merchantId); // Merchant id
 payButton.setTerminalId(terminalId); // Terminal  id
 payButton.setPayAmount(amount); // Amount
-payButton.setCurrencyCode(currencyCode); // Currency Code [Optional].
-payButton.setMerchantSecureHash("Merchant secure hash");
+payButton.setCurrencyCode(currencyCode); // Currency Code [Optional]
+payButton.setMerchantSecureHash("Merchant secure hash"); // Merchant secure hash
 
 2 - in order to create transaction call:-
 
@@ -91,7 +91,8 @@ this listener has 2 methods:-
       this method called in case transaction success by card payment with SuccessfulCardTransaction object.
   2 - onWalletTransactionSuccess method 
       this method is called if customer make a wallet transaction with SuccessfulWalletTransaction object.
- 3- onError method in case transaction failed with Throwable exception that has error info.
+  3- onError method in case transaction failed with Throwable exception that has error info.
+  
 Example:- 
 
           payButton.createTransaction(new PayButton.PaymentTransactionCallback() {
