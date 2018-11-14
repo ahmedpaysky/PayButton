@@ -11,7 +11,9 @@ These instructions will get you a copy of the project up and running on your loc
 What things you need to install the software and how to install them
 
 ```
-Create new Android project in Android Studio or if you have project already.
+1-JDK installed on your machine with minimum version 1.7 .
+2-Android Studio
+3-Create new Android project in Android Studio to use SDK or if you have created a project before.
 ```
 
 ### Installing
@@ -24,17 +26,17 @@ A step by step that tell you how to get our SDK in your project.
 maven { url 'https://jitpack.io' }
 Example:-
 allprojects { repositories {
-     maven { url 'https://jitpack.io' }
+        maven { url 'https://jitpack.io' }
                            }
-            }
-3- in your build.gradle file in app level in dependencies{} add :- implementation 'com.github.payskyCompany:fabsdk:1.1.10'
+              }
+3- in your build.gradle file in app level in dependencies{} add :- implementation 'com.github.paybutton:fabsdk:1.1.16'
 Example:-
 dependencies {
   implementation 'com.github.payskyCompany:paybutton:1.1.16'
 }
 4- Sync your project.
 
-Note:- 1.1.16 may not be the last version check Releases in github to get latest version.
+Note:- version 1.1.16 may not be the last version check Releases in github to get latest version.
 ```
 ### Using SDK
 
@@ -59,7 +61,7 @@ Example:-
 payButton.setMerchantId(merchantId); // Merchant id
 payButton.setTerminalId(terminalId); // Terminal  id
 payButton.setPayAmount(amount); // Amount
-payButton.setCurrencyCode(currencyCode); // Currency Code
+payButton.setCurrencyCode(currencyCode); // Currency Code [Optional].
 payButton.setMerchantSecureHash("Merchant secure hash");
 
 2 - in order to create transaction call:-
@@ -121,7 +123,7 @@ in your project, encrypt them before save them in project.
 ## Built With
 
 * [Retrofit](http://square.github.io/retrofit/) - Android Networking library.
-* [https://github.com/greenrobot/EventBus) - Event bus send events between your classes.
+* [EventBus](https://github.com/greenrobot/EventBus) - Event bus send events between your classes.
 
 
 ## Authors
