@@ -60,10 +60,9 @@
                     android:paddingEnd="8dp"
                     android:paddingStart="8dp"
                     android:singleLine="true"
-                    android:text="5123456789012346"
                     android:textColorHint="?android:textColorHint"
                     android:textDirection="ltr"
-                    android:textSize="@dimen/_13ssp" />
+                    android:textSize="@dimen/_14ssp" />
 
                 <ImageView
                     android:id="@+id/scan_camera_imageView"
@@ -113,7 +112,7 @@
                     android:paddingStart="8dp"
                     android:singleLine="true"
                     android:textColorHint="?android:textColorHint"
-                    android:textSize="@dimen/_13ssp" />
+                    android:textSize="@dimen/_14ssp" />
 
                 <EditText
                     android:id="@+id/ccv_editText"
@@ -132,7 +131,7 @@
                     android:paddingStart="8dp"
                     android:singleLine="true"
                     android:textColorHint="?android:textColorHint"
-                    android:textSize="@dimen/_13ssp" />
+                    android:textSize="@dimen/_14ssp" />
             </TableRow>
 
             <Button

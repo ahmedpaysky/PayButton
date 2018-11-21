@@ -60,7 +60,8 @@
                     android:background="@drawable/edittext_drawable"
                     android:hint="@string/mobile_number"
                     android:inputType="phone"
-                    android:paddingStart="@dimen/_4sdp" />
+                    android:paddingStart="@dimen/_4sdp"
+                    android:textSize="@dimen/_14ssp" />
             </LinearLayout>
 
             <Button
@@ -112,6 +113,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="@dimen/_8sdp"
             android:layout_marginStart="@dimen/_8sdp"
+            android:layout_marginBottom="@dimen/_4sdp"
             android:gravity="center_vertical"
             android:weightSum="2">
 
