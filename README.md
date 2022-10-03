@@ -28,11 +28,11 @@ maven { url 'https://jitpack.io' }
 ```
 3. In your build.gradle file in app level in dependencies{} add
 ```
-implementation 'com.github.payskyCompany:paybutton:1.1.16'
+implementation 'com.github.payskyCompany:paybutton:1.1.20'
 ```
 4. Sync your project.
 
-Note: Version 1.1.16 may not be the last version check Releases in github to get latest version.
+Note: Version 1.1.20 may not be the last version check Releases in github to get latest version.
 
 ## :rocket: Deployment
 1. Before deploying your project live, you should get a merchant ID and terminal ID from our company.
