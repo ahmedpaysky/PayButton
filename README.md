@@ -27,7 +27,9 @@ maven { url 'https://jitpack.io' }
 ```
 3. In your build.gradle file in app level in dependencies{} add
 ```
-implementation 'com.github.payskyCompany:paybutton:1.1.20'
+dependencies {
+    implementation 'com.github.payskyCompany:paybutton-sdk:2.0.7'
+}
 ```
 4. Sync your project.
 
